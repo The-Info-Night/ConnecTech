@@ -5,7 +5,15 @@ import SideNavbar from "./components/SideNavbar";
 
 export default function Home() {
   return (
-    <div className="font-sans min-h-screen bg-white dark:bg-black">
+    <div
+      className="font-sans min-h-screen bg-white dark:bg-black relative"
+      style={{
+        backgroundImage: 'url("/background.png")',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+      }}
+    >
       {/* Side Navbar */}
       <SideNavbar />
       {/* Main content placeholder */}
