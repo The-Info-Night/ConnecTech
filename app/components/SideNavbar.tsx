@@ -30,7 +30,7 @@ export default function SideNavbar() {
         <path d="M4 16h16" />
         <path d="M4 12h16" />
       </svg>
-    ), href: "/pitch-deck" },
+    ), href: "/public_pages/pitch-deck" },
   ];
 
   return (
