@@ -1,5 +1,5 @@
-import Home from "../home_dashboard";
-import SideNavbar from "../components/SideNavbar";
+import SideNavbar from "../../components/SideNavbar";
+import Home from "./home_dashboard";
 
 export default function AdminHomePage() {
   return (

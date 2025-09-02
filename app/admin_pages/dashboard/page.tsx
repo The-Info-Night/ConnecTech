@@ -1,5 +1,5 @@
 import AdminDashboardPage from "./dashboard";
-import SideNavbar from "./components/SideNavbar";
+import SideNavbar from "../../components/SideNavbar";
 
 export default function DashboardPage() {
   return (

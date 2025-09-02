@@ -1,19 +1,12 @@
 "use client";
-import Image from "next/image";
-import { useState } from "react";
-import SideNavbar from "./components/SideNavbar";
-
 export default function Home() {
   return (
     <div className="font-sans min-h-screen bg-white dark:bg-black">
-      {/* Side Navbar */}
-      <SideNavbar />
-      {/* Main content placeholder */}
       <main className="flex flex-col items-center justify-center min-h-[70vh] py-16 ml-0 md:ml-56 transition-all duration-300"
         style={{ marginLeft: "var(--side-navbar-width, 14rem)" }}
       >
         <h1 className="text-3xl font-bold mb-4 text-gray-900 dark:text-gray-100">
-          Welcome to Connectech Public Home Page!
+          Welcome to Connectech Admin Home Page!
         </h1>
         <p className="text-gray-600 dark:text-gray-300 text-lg">
           Select a section from the navigation bar to get started.
