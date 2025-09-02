@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
 import { useState } from "react";
+import ProjectsCatalog from "./components/ProjectsCatalog";
 
 function SettingsDropdown() {
   const [open, setOpen] = useState(false);
@@ -54,42 +55,42 @@ function SideNavbar() {
   const [open, setOpen] = useState(true);
 
   const navItems = [
-    { name: "Dashboard", icon: (
+  { name: "Dashboard", icon: (
       <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
         <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8v-10h-8v10zm0-18v6h8V3h-8z" />
       </svg>
     ), href: "#dashboard" },
-    { name: "Network", icon: (
+  { name: "Network", icon: (
       <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
         <circle cx="12" cy="12" r="3" />
         <path d="M12 3v3m0 12v3m9-9h-3M6 12H3m15.364-6.364l-2.121 2.121M6.757 17.243l-2.121 2.121m12.728 0l-2.121-2.121M6.757 6.757L4.636 4.636" />
       </svg>
     ), href: "#network" },
-    { name: "Catalog", icon: (
+  { name: "Catalog", icon: (
       <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
         <rect x="3" y="7" width="18" height="13" rx="2" />
         <path d="M16 3v4M8 3v4" />
       </svg>
-    ), href: "/catalog#catalog_home" },
-    { name: "Search", icon: (
+    ), href: "#catalog" },
+  { name: "Search", icon: (
       <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
         <circle cx="11" cy="11" r="7" />
         <path d="M21 21l-4.35-4.35" />
       </svg>
     ), href: "#search" },
-    { name: "Notification", icon: (
+  { name: "Notification", icon: (
       <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
         <path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
         <path d="M13.73 21a2 2 0 01-3.46 0" />
       </svg>
     ), href: "#notification" },
-    { name: "Home", icon: (
+  { name: "Home", icon: (
       <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
         <path d="M3 12l9-9 9 9" />
         <path d="M9 21V9h6v12" />
       </svg>
-    ), href: "#home" },
-  ];
+    ), href: "/" },
+];
 
   return (
     <aside
@@ -142,17 +143,9 @@ function SideNavbar() {
   );
 }
 
-export default function Home() {
+export default function catalog_home() {
   return (
-    <div
-      className="font-sans min-h-screen bg-white dark:bg-black relative"
-      style={{
-        backgroundImage: 'url("/background.png")',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-      }}
-    >
+    <div className="font-sans min-h-screen bg-white dark:bg-black">
       {/* Side Navbar */}
       <SideNavbar />
       {/* Top Navbar */}
@@ -189,10 +182,10 @@ export default function Home() {
           </li>
           <li>
             <a
-              href="#projects"
+              href="#catalog"
               className="hover:text-blue-600 dark:hover:text-blue-400 transition"
             >
-              Projects
+              Catalog
             </a>
           </li>
           <li>
@@ -212,12 +205,7 @@ export default function Home() {
       <main className="flex flex-col items-center justify-center min-h-[70vh] py-16 ml-0 md:ml-56 transition-all duration-300"
         style={{ marginLeft: "var(--side-navbar-width, 14rem)" }}
       >
-        <h1 className="text-3xl font-bold mb-4 text-gray-900 dark:text-gray-100">
-          Welcome to Connectech!
-        </h1>
-        <p className="text-gray-600 dark:text-gray-300 text-lg">
-          Select a section from the navigation bar to get started.
-        </p>
+        <ProjectsCatalog />
       </main>
       <style jsx global>{`
         @media (min-width: 768px) {
