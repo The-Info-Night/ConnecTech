@@ -1,7 +1,6 @@
 "use client";
 import React, { useState } from 'react';
 import { supabase } from '../../supabaseClient';
-import { useRouter } from "next/navigation";
 
 const GITHUB_LOGO = (
   <svg
@@ -22,42 +21,28 @@ const GITHUB_LOGO = (
   </svg>
 );
 
-const Login: React.FC<{ switchToSignup: () => void }> = ({ switchToSignup }) => {
-  const router = useRouter();
+const Signup: React.FC<{ switchToLogin: () => void }> = ({ switchToLogin }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState<string | null>(null);
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
     setSuccess(null);
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      const { data, error } = await supabase.auth.signUp({ email, password });
       if (error) {
         setError(error.message);
         setLoading(false);
         return;
       }
-      setSuccess('Login successful !');
-      router.push("/");
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { error: dbError } = await supabase
-          .from('users')
-          .insert([{ id: user.id, email: user.email }]);
-        if (dbError) {
-          setError("Login successful, but an error occurred while registering in the database: " + dbError.message);
-          setLoading(false);
-          return;
-        }
-        setSuccess("User profile registered !");
-      }
+      setSuccess("Account created! Check your email for confirmation.");
     } catch (err: any) {
-      setError("An unexpected error occurred while logging in.");
+      setError("An unexpected error occurred while creating the account.");
     }
     setLoading(false);
   };
@@ -72,15 +57,15 @@ const Login: React.FC<{ switchToSignup: () => void }> = ({ switchToSignup }) => 
         setError(error.message);
       }
     } catch (err: any) {
-      setError("An unexpected error occurred while logging in with GitHub.");
+      setError("An unexpected error occurred while signing up with GitHub.");
     }
     setLoading(false);
   };
 
   return (
     <>
-      <form onSubmit={handleLogin} className="space-y-4">
-        <h2 className="text-2xl font-bold mb-6 text-center text-blue-900 dark:text-blue-400">Login to Connectech</h2>
+      <form onSubmit={handleSignup} className="space-y-4">
+        <h2 className="text-2xl font-bold mb-6 text-center text-blue-900 dark:text-blue-400">Create an account</h2>
         <input
           type="email"
           placeholder="Email"
@@ -106,10 +91,10 @@ const Login: React.FC<{ switchToSignup: () => void }> = ({ switchToSignup }) => 
             loading ? 'bg-gray-400 text-gray-100' : 'bg-blue-600 hover:bg-blue-700 text-white'
           }`}
         >
-          {loading ? 'Logging in...' : 'Login'}
+          {loading ? 'Creating...' : 'Create account'}
         </button>
       </form>
-
+      
       <div className="flex items-center my-4">
         <div className="flex-grow border-t border-gray-300 dark:border-gray-700"></div>
         <span className="mx-2 text-gray-400 text-xs">or</span>
@@ -132,14 +117,14 @@ const Login: React.FC<{ switchToSignup: () => void }> = ({ switchToSignup }) => 
 
       <div className="mt-4 text-center">
         <span>
-          No account?{' '}
+          Already have an account?{' '}
           <button
             type="button"
             className="text-blue-600 hover:underline font-medium"
-            onClick={switchToSignup}
+            onClick={switchToLogin}
             disabled={loading}
           >
-            Create an account
+            Login
           </button>
         </span>
       </div>
@@ -147,4 +132,4 @@ const Login: React.FC<{ switchToSignup: () => void }> = ({ switchToSignup }) => 
   );
 };
 
-export default Login;
+export default Signup;
