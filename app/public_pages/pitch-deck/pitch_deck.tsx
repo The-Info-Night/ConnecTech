@@ -7,28 +7,28 @@ import Link from "next/link";
 
 export default function PitchDeckPage(){
     const contentRef = useRef<HTMLDivElement | null>(null);
-  
+
     const handleExport = async () => {
       if (!contentRef.current) return;
-  
+
       try {
         const canvas = await html2canvas(contentRef.current, {
           scale: 2,
           backgroundColor: "#ffffff"
         });
         const imgData = canvas.toDataURL("image/png");
-  
+
         const pdf = new jsPDF("p", "mm", "a4");
         const pdfWidth = pdf.internal.pageSize.getWidth();
         const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-  
+
         pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
         pdf.save("pitch-deck.pdf");
       } catch (err) {
         console.error("❌ Error exporting PDF:", err);
       }
     };
-  
+
     return (
       <div className="font-sans min-h-screen bg-white dark:bg-black">
         {/* Main content */}
@@ -38,7 +38,7 @@ export default function PitchDeckPage(){
           <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-gray-100">
             Pitch Deck
           </h1>
-  
+
           {/* Zone exportable */}
           <div
             ref={contentRef}
@@ -55,7 +55,7 @@ export default function PitchDeckPage(){
               <li>📈 Engagement: 37%</li>
             </ul>
           </div>
-  
+
           <div className="group">
             <button
                 onClick={handleExport}
@@ -68,7 +68,7 @@ export default function PitchDeckPage(){
             </button>
             </div>
         </main>
-        
+
         <style jsx global>{`
           @media (min-width: 768px) {
             :root {
