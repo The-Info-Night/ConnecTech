@@ -24,6 +24,7 @@ const GITHUB_LOGO = (
 const Signup: React.FC<{ switchToLogin: () => void }> = ({ switchToLogin }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [pseudo, setPseudo] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState<string | null>(null);
@@ -33,10 +34,20 @@ const Signup: React.FC<{ switchToLogin: () => void }> = ({ switchToLogin }) => {
     setLoading(true);
     setError(null);
     setSuccess(null);
+
     try {
-      const { data, error } = await supabase.auth.signUp({ email, password });
-      if (error) {
-        setError(error.message);
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            pseudo: pseudo,
+          }
+        }
+      });
+
+      if (signUpError) {
+        setError(signUpError.message);
         setLoading(false);
         return;
       }
@@ -67,6 +78,15 @@ const Signup: React.FC<{ switchToLogin: () => void }> = ({ switchToLogin }) => {
       <form onSubmit={handleSignup} className="space-y-4">
         <h2 className="text-2xl font-bold mb-6 text-center text-blue-900 dark:text-blue-400">Create an account</h2>
         <input
+          type="text"
+          placeholder="Pseudo"
+          value={pseudo}
+          onChange={e => setPseudo(e.target.value)}
+          required
+          disabled={loading}
+          className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
+        />
+        <input
           type="email"
           placeholder="Email"
           value={email}
@@ -94,7 +114,7 @@ const Signup: React.FC<{ switchToLogin: () => void }> = ({ switchToLogin }) => {
           {loading ? 'Creating...' : 'Create account'}
         </button>
       </form>
-      
+
       <div className="flex items-center my-4">
         <div className="flex-grow border-t border-gray-300 dark:border-gray-700"></div>
         <span className="mx-2 text-gray-400 text-xs">or</span>
