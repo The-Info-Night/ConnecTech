@@ -22,6 +22,12 @@ export default function SideNavbar() {
         <path d="M9 21V9h6v12" />
       </svg>
     ), href: "/" },
+    { name: "Catalog", icon: (
+      <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+        <path d="M3 12l9-9 9 9" />
+        <path d="M9 21V9h6v12" />
+      </svg>
+    ), href: "/public_pages/catalog" },
     { name: "Pitch Deck", icon: (
       <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
         <path d="M12 20h9" />
