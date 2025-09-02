@@ -12,14 +12,6 @@ const Login: React.FC = () => {
   const [mode, setMode] = useState<'login' | 'signup'>('login');
   const [success, setSuccess] = useState<string | null>(null);
 
-  function isInvalidApiKeyError(message: string) {
-    return (
-      message.toLowerCase().includes('invalid api key') ||
-      message.toLowerCase().includes('invalid key') ||
-      message.toLowerCase().includes('401')
-    );
-  }
-
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
