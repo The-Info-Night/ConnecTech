@@ -1,6 +1,7 @@
 "use client";
 import SideNavbar from "../components/Home/SideNavbar";
 import TopNavbar from "../components/Home/TopNavbar";
+import login from "./login/login";
 
 export default function Home() {
   return (

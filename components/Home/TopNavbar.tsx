@@ -1,7 +1,28 @@
 import Image from "next/image";
 import SettingsDropdown from "./SettingsDropdown";
+import { useEffect, useState } from "react";
+import { supabase } from "../../supabaseClient";
+import { useRouter } from "next/navigation";
+import AccountDropdown from "./AccountDropdown";
 
 export default function TopNavbar() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      setIsAuthenticated(!!data?.user);
+    });
+
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsAuthenticated(!!session?.user);
+    });
+
+    return () => {
+      authListener?.subscription?.unsubscribe();
+    };
+  }, []);
+
   return (
     <nav
       className="flex items-center justify-between px-8 py-4 border-b border-gray-200 dark:border-gray-800 fixed top-0 left-0 right-0 bg-white dark:bg-black z-30"
@@ -42,6 +63,18 @@ export default function TopNavbar() {
         <li>
           <SettingsDropdown />
         </li>
+        <li className="ml-4 relative">
+        {!isAuthenticated ? (
+          <button
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+            onClick={() => router.push("/login")}
+          >
+            Login
+          </button>
+        ) : (
+          <AccountDropdown />
+        )}
+      </li>
       </ul>
     </nav>
   );
