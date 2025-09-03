@@ -44,7 +44,7 @@ export default async function AdminDashboardPage() {
   }
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-10">
+    <main className="mx-auto max-w-6xl px-4 py-10" style={{ backgroundColor: "#1A1D21" }}>
       <header className="mb-8">
         <h1 className="text-2xl font-semibold tracking-tight">Admin Dashboard</h1>
       </header>

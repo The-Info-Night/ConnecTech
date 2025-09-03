@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import Image from "next/image";
 
 export default function SideNavbar() {
   const [open, setOpen] = useState(true);
@@ -23,10 +24,12 @@ export default function SideNavbar() {
       </svg>
     ), href: "/" },
     { name: "Catalog", icon: (
-      <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-        <path d="M3 12l9-9 9 9" />
-        <path d="M9 21V9h6v12" />
-      </svg>
+      <Image
+        src="/catalog.svg"
+        alt="Catalog Icon"
+        width={24}
+        height={24}
+      />
     ), href: "/public_pages/catalog" },
     { name: "Pitch Deck", icon: (
       <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
