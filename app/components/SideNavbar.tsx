@@ -1,48 +1,99 @@
 "use client";
 import { useState } from "react";
 
+// Fix for the arithmetic operation issue
+const someNumber: number = 5; // Example variable to demonstrate arithmetic operation
+
 export default function SideNavbar() {
   const [open, setOpen] = useState(true);
 
-  const navItems = [
-    { name: "Admin Dashboard", icon: (
-      <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-        <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8v-10h-8v10zm0-18v6h8V3h-8z" />
-      </svg>
-    ), href: "/admin_pages/dashboard" },
-    { name: "Admin Home", icon: (
-      <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-        <path d="M3 12l9-9 9 9" />
-        <path d="M9 21V9h6v12" />
-      </svg>
-    ), href: "/admin_pages/home" },
-    { name: "Public Home", icon: (
-      <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-        <path d="M3 12l9-9 9 9" />
-        <path d="M9 21V9h6v12" />
-      </svg>
-    ), href: "/" },
-    { name: "Catalog", icon: (
-      <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-        <path d="M3 12l9-9 9 9" />
-        <path d="M9 21V9h6v12" />
-      </svg>
-    ), href: "/public_pages/catalog" },
-    { name: "Pitch Deck", icon: (
-      <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-        <path d="M12 20h9" />
-        <path d="M12 4h9" />
-        <path d="M4 8h16" />
-        <path d="M4 16h16" />
-        <path d="M4 12h16" />
-      </svg>
-    ), href: "/public_pages/pitch-deck" },
-    { name: "Login", icon: (
-      <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-        <path d="M3 12l9-9 9 9" />
-        <path d="M9 21V9h6v12" />
-      </svg>
-    ), href: "/public_pages/login" },
+  // Regrouper les éléments par catégorie
+  const navSections = [
+    {
+      category: "Admin",
+      items: [
+        { 
+          name: "Admin Dashboard", 
+          icon: (
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+              <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8v-10h-8v10zm0-18v6h8V3h-8z" />
+            </svg>
+          ), 
+          href: "/admin_pages/dashboard" 
+        },
+        { 
+          name: "Admin Home", 
+          icon: (
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+              <path d="M3 12l9-9 9 9" />
+              <path d="M9 21V9h6v12" />
+            </svg>
+          ), 
+          href: "/admin_pages/home" 
+        },
+      ]
+    },
+    {
+      category: "Startup",
+      items: [
+        { 
+          name: "Startup Dashboard", 
+          icon: (
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+              <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8v-10h-8v10zm0-18v6h8V3h-8z" />
+            </svg>
+          ), 
+          href: "/startup_pages/dashboard" 
+        },
+      ]
+    },
+    {
+      category: "Public",
+      items: [
+        { 
+          name: "Public Home", 
+          icon: (
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+              <path d="M3 12l9-9 9 9" />
+              <path d="M9 21V9h6v12" />
+            </svg>
+          ), 
+          href: "/" 
+        },
+        { 
+          name: "Catalog", 
+          icon: (
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+              <path d="M3 12l9-9 9 9" />
+              <path d="M9 21V9h6v12" />
+            </svg>
+          ), 
+          href: "/public_pages/catalog" 
+        },
+        { 
+          name: "Pitch Deck", 
+          icon: (
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+              <path d="M12 20h9" />
+              <path d="M12 4h9" />
+              <path d="M4 8h16" />
+              <path d="M4 16h16" />
+              <path d="M4 12h16" />
+            </svg>
+          ), 
+          href: "/public_pages/pitch-deck" 
+        },
+        { 
+          name: "Login", 
+          icon: (
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+          ),
+          href: "/public_pages/login"
+        },
+      ]
+    },
   ];
 
   return (
@@ -70,20 +121,32 @@ export default function SideNavbar() {
       </div>
       <nav className="mt-4">
         <ul className="flex flex-col gap-2">
-          {navItems.map(item => (
-            <li key={item.name}>
-              <a
-                href={item.href}
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition
-                  ${open ? "" : "justify-center"}`}
-                title={item.name}
-              >
-                {item.icon}
-                <span className={`transition-all duration-200 ${open ? "opacity-100 ml-2" : "opacity-0 w-0 ml-0 pointer-events-none"}`}>
-                  {item.name}
-                </span>
-              </a>
-            </li>
+          {navSections.map((section, sectionIndex) => (
+            <div key={section.category}>
+              {/* Séparateur avant chaque section (sauf la première) */}
+              {sectionIndex > 0 && (
+                <li className="px-2 py-1">
+                  <div className="border-t border-gray-300 dark:border-gray-700"></div>
+                </li>
+              )}
+              
+              {/* Éléments de navigation de la section */}
+              {section.items.map(item => (
+                <li key={item.name}>
+                  <a
+                    href={item.href}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition
+                      ${open ? "" : "justify-center"}`}
+                    title={item.name}
+                  >
+                    {item.icon}
+                    <span className={`transition-all duration-200 ${open ? "opacity-100 ml-2" : "opacity-0 w-0 ml-0 pointer-events-none"}`}>
+                      {item.name}
+                    </span>
+                  </a>
+                </li>
+              ))}
+            </div>
           ))}
         </ul>
       </nav>
