@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabase } from "@/lib/supabaseServer";
+import { supabaseServer } from "@/lib/supabaseServer";
 
 const API_BASE = process.env.API_BASE_URL!;
 const API_TOKEN = process.env.JEB_API_TOKEN!;
@@ -18,22 +18,22 @@ async function fetchJSON<T>(path: string): Promise<T> {
 export async function GET() {
   try {
     const startups = await fetchJSON<any[]>('/startups');
-    await supabase.from('startups').upsert(startups, { onConflict: 'id' });
+    await supabaseServer.from('startups').upsert(startups, { onConflict: 'id' });
 
     const investors = await fetchJSON<any[]>('/investors');
-    await supabase.from('investors').upsert(investors, { onConflict: 'id' });
+    await supabaseServer.from('investors').upsert(investors, { onConflict: 'id' });
 
     const partners = await fetchJSON<any[]>('/partners');
-    await supabase.from('partners').upsert(partners, { onConflict: 'id' });
+    await supabaseServer.from('partners').upsert(partners, { onConflict: 'id' });
 
     const newsList = await fetchJSON<any[]>('/news');
-    await supabase.from('news').upsert(newsList, { onConflict: 'id' });
+    await supabaseServer.from('news').upsert(newsList, { onConflict: 'id' });
 
     const events = await fetchJSON<any[]>('/events');
-    await supabase.from('events').upsert(events, { onConflict: 'id' });
+    await supabaseServer.from('events').upsert(events, { onConflict: 'id' });
 
     const users = await fetchJSON<any[]>('/users');
-    await supabase.from('users').upsert(users, { onConflict: 'id' });
+    await supabaseServer.from('users').upsert(users, { onConflict: 'id' });
 
     return NextResponse.json({ message: 'Sync completed successfully' });
   } catch (error) {
