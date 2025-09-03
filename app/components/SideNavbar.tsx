@@ -5,6 +5,12 @@ export default function SideNavbar() {
   const [open, setOpen] = useState(true);
 
   const navItems = [
+    { name: "Login", icon: (
+      <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+        <path d="M3 12l9-9 9 9" />
+        <path d="M9 21V9h6v12" />
+      </svg>
+    ), href: "/public_pages/login" },
     { name: "Admin Dashboard", icon: (
       <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
         <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8v-10h-8v10zm0-18v6h8V3h-8z" />
@@ -37,12 +43,6 @@ export default function SideNavbar() {
         <path d="M4 12h16" />
       </svg>
     ), href: "/public_pages/pitch-deck" },
-    { name: "Login", icon: (
-      <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-        <path d="M3 12l9-9 9 9" />
-        <path d="M9 21V9h6v12" />
-      </svg>
-    ), href: "/public_pages/login" },
     { name: "Messages", icon: (
       <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
