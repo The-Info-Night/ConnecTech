@@ -7,7 +7,7 @@ const someNumber: number = 5; // Example variable to demonstrate arithmetic oper
 export default function SideNavbar() {
   const [open, setOpen] = useState(true);
 
-  // Regrouper les éléments par catégorie
+  
   const navSections = [
     {
       category: "Admin",
@@ -123,14 +123,12 @@ export default function SideNavbar() {
         <ul className="flex flex-col gap-2">
           {navSections.map((section, sectionIndex) => (
             <div key={section.category}>
-              {/* Séparateur avant chaque section (sauf la première) */}
               {sectionIndex > 0 && (
                 <li className="px-2 py-1">
                   <div className="border-t border-gray-300 dark:border-gray-700"></div>
                 </li>
               )}
               
-              {/* Éléments de navigation de la section */}
               {section.items.map(item => (
                 <li key={item.name}>
                   <a
