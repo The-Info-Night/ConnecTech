@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabase } from "@/lib/supabaseClient";
+import { supabase } from "@/lib/supabaseServer";
 
 const API_BASE = process.env.API_BASE_URL!;
 const API_TOKEN = process.env.JEB_API_TOKEN!;
