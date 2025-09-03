@@ -1,12 +1,37 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import AccountDropdown from "./AccountDropdown";
+import { supabase } from "../../supabaseClient";
 
 // Fix for the arithmetic operation issue
 const someNumber: number = 5; // Example variable to demonstrate arithmetic operation
 
 export default function SideNavbar() {
   const [open, setOpen] = useState(true);
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    let isMounted = true;
+    async function getUser() {
+      setLoading(true);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (isMounted) {
+        setUser(user);
+        setLoading(false);
+      }
+    }
+    getUser();
+
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => {
+      isMounted = false;
+      listener?.subscription.unsubscribe();
+    };
+  }, []);
   
   const navSections = [
     {
@@ -92,59 +117,61 @@ export default function SideNavbar() {
           ),
           href: "/public_pages/login"
         },
+            { name: "Messages", icon: (
+      <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+      </svg>
+    ), href: "/messages" },
       ]
     },
   ];
 
   return (
-    <aside
-      className={`fixed inset-y-0 left-0 z-20 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 transition-all duration-300
-        ${open ? "w-56" : "w-16"}`}
-    >
+    <aside className={`fixed inset-y-0 left-0 z-20 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 transition-all duration-300 ${open ? "w-56" : "w-16"}`}>
       <div className="flex items-center justify-end px-4 py-4 border-b border-gray-200 dark:border-gray-800">
         <button
           className="ml-auto p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition"
           onClick={() => setOpen(v => !v)}
           aria-label={open ? "Hide sidebar" : "Show sidebar"}
         >
-          <svg
-            className={`w-6 h-6 transition-transform ${open ? "" : "rotate-180"}`}
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={2}
-            viewBox="0 0 24 24"
-          >
+          <svg className={`w-6 h-6 transition-transform ${open ? "" : "rotate-180"}`} fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
             <path d="M19 12H5" />
             <path d="M12 5l-7 7 7 7" />
           </svg>
         </button>
       </div>
+
       <nav className="mt-4">
         <ul className="flex flex-col gap-2">
-          {navSections.map((section, sectionIndex) => (
-            <div key={section.category}>
-              {sectionIndex > 0 && (
-                <li className="px-2 py-1">
-                  <div className="border-t border-gray-300 dark:border-gray-700"></div>
-                </li>
-              )}
-              
-              {section.items.map(item => (
-                <li key={item.name}>
-                  <a
-                    href={item.href}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition
-                      ${open ? "" : "justify-center"}`}
-                    title={item.name}
-                  >
-                    {item.icon}
-                    <span className={`transition-all duration-200 ${open ? "opacity-100 ml-2" : "opacity-0 w-0 ml-0 pointer-events-none"}`}>
-                      {item.name}
-                    </span>
-                  </a>
-                </li>
-              ))}
-            </div>
+          <li key="login-or-account">
+            {loading ? (
+              <div className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-gray-700 dark:text-gray-200 transition ${open ? "" : "justify-center"}`}>
+                <span className={`transition-all duration-200 ${open ? "opacity-100 ml-2" : "opacity-0 w-0 ml-0 pointer-events-none"}`}>
+                  ...
+                </span>
+              </div>
+            ) : user && open ? (
+              <div className={`flex items-center ${open ? "" : "justify-center"}`}>
+                <AccountDropdown userId={user.id} />
+              </div>
+            ) : (
+              <a href="/public_pages/login" className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition ${open ? "" : "justify-center"}`} title="Login">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                  <path d="M3 12l9-9 9 9" />
+                  <path d="M9 21V9h6v12" />
+                </svg>
+                <span className={`transition-all duration-200 ${open ? "opacity-100 ml-2" : "opacity-0 w-0 ml-0 pointer-events-none"}`}>Login</span>
+              </a>
+            )}
+          </li>
+
+          {navItems.map(item => (
+            <li key={item.name}>
+              <a href={item.href} className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition ${open ? "" : "justify-center"}`} title={item.name}>
+                {item.icon}
+                <span className={`transition-all duration-200 ${open ? "opacity-100 ml-2" : "opacity-0 w-0 ml-0 pointer-events-none"}`}>{item.name}</span>
+              </a>
+            </li>
           ))}
         </ul>
       </nav>
