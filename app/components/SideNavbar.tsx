@@ -71,6 +71,15 @@ export default function SideNavbar() {
           ), 
           href: "/startup_pages/dashboard" 
         },
+        {
+          name: "Messages",
+          icon: (
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+            </svg>
+          ),
+          href: "/public_pages/messages"
+        },
       ]
     },
     {
@@ -110,14 +119,15 @@ export default function SideNavbar() {
           href: "/public_pages/pitch-deck" 
         },
         {
-          name: "Messages",
+          name: "Events",
           icon: (
             <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+              <path d="M3 4h18v18H3z" />
+              <path d="M16 2v4M8 2v4M3 10h18" />
             </svg>
           ),
-          href: "/public_pages/messages"
-        },
+          href: "/public_pages/events"
+        }
       ]
     },
   ];
@@ -142,6 +152,7 @@ export default function SideNavbar() {
       <nav className="mt-4">
         <ul className="flex flex-col gap-2">
           <li key="login-or-account">
+            {/* ton bloc login / account inchangé */}
             {loading ? (
               <div className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-gray-700 dark:text-gray-200 transition ${open ? "" : "justify-center"}`}>
                 <span className={`transition-all duration-200 ${open ? "opacity-100 ml-2" : "opacity-0 w-0 ml-0 pointer-events-none"}`}>
@@ -163,13 +174,37 @@ export default function SideNavbar() {
             )}
           </li>
 
-          {navItems.map(item => (
-            <li key={item.name}>
-              <a href={item.href} className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition ${open ? "" : "justify-center"}`} title={item.name}>
-                {item.icon}
-                <span className={`transition-all duration-200 ${open ? "opacity-100 ml-2" : "opacity-0 w-0 ml-0 pointer-events-none"}`}>{item.name}</span>
-              </a>
-            </li>
+          {/* Boucle sur les sections avec séparateur */}
+          {navSections.map((section, sectionIndex) => (
+            <div key={section.category}>
+              {/* Ligne de séparation sauf pour la première section */}
+              {sectionIndex > 0 && (
+                <hr className="my-2 border-gray-200 dark:border-gray-700" />
+              )}
+
+              {section.items.map(item => (
+                <li key={item.name}>
+                  <a
+                    href={item.href}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition ${
+                      open ? "" : "justify-center"
+                    }`}
+                    title={item.name}
+                  >
+                    {item.icon}
+                    <span
+                      className={`transition-all duration-200 ${
+                        open
+                          ? "opacity-100 ml-2"
+                          : "opacity-0 w-0 ml-0 pointer-events-none"
+                      }`}
+                    >
+                      {item.name}
+                    </span>
+                  </a>
+                </li>
+              ))}
+            </div>
           ))}
         </ul>
       </nav>
