@@ -1,31 +1,74 @@
 "use client";
 import { useState, useEffect } from "react";
-import type { ReactNode } from "react";
 import AccountDropdown from "./AccountDropdown";
 import { supabase } from "../../supabaseClient";
-
-// Fix for the arithmetic operation issue
-const someNumber: number = 5; // Example variable to demonstrate arithmetic operation
 
 export default function SideNavbar() {
   const [open, setOpen] = useState(true);
   const [user, setUser] = useState<any>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+
+  type NavItem = {
+    name: string;
+    icon: React.ReactNode;
+    href: string;
+  };
 
   useEffect(() => {
     let isMounted = true;
-    async function getUser() {
+
+    async function getUserAndRole() {
       setLoading(true);
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError) {
+        console.error("Erreur getUser:", userError.message);
+        setLoading(false);
+        return;
+      }
       if (isMounted) {
         setUser(user);
-        setLoading(false);
+      }
+
+      if (user?.id) {
+        const { data, error: roleError } = await supabase
+          .from("users")
+          .select("role")
+          .eq("email", user.email)
+          .maybeSingle();
+
+          if (roleError) {
+            console.error("Erreur get role:", roleError.message);
+            if (isMounted) setUserRole(null);
+          } else {
+            if (isMounted) setUserRole(data?.role || null);
+            if (isMounted) setLoading(false);
+          }
+      } else {
+        if (isMounted) {
+          setUserRole(null);
+          setLoading(false);
+        }
       }
     }
-    getUser();
+
+    getUserAndRole();
 
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
+      if (session?.user?.id) {
+        supabase
+          .from("users")
+          .select("role")
+          .eq("email", session.user.email)
+          .maybeSingle()
+          .then(({ data, error }) => {
+            if (!error) setUserRole(data?.role || null);
+            else setUserRole(null);
+          });
+      } else {
+        setUserRole(null);
+      }
     });
 
     return () => {
@@ -33,71 +76,32 @@ export default function SideNavbar() {
       listener?.subscription.unsubscribe();
     };
   }, []);
-  
-  const navSections = [
+
+  const navSections: { category: string; items: NavItem[] }[] = [
     {
       category: "Admin",
       items: [
-        { 
-          name: "Admin Dashboard", 
+        {
+          name: "Admin Dashboard",
           icon: (
             <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
               <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8v-10h-8v10zm0-18v6h8V3h-8z" />
             </svg>
-          ), 
-          href: "/admin_pages/dashboard" 
+          ),
+          href: "/admin_pages/dashboard"
         },
-        { 
-          name: "Admin Home", 
+        {
+          name: "Admin Home",
           icon: (
             <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
               <path d="M3 12l9-9 9 9" />
               <path d="M9 21V9h6v12" />
             </svg>
-          ), 
-          href: "/admin_pages/home" 
+          ),
+          href: "/admin_pages/home"
         },
-      ]
-    },
-    {
-      category: "Startup",
-      items: [
-        { 
-          name: "Startup Dashboard", 
-          icon: (
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-              <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8v-10h-8v10zm0-18v6h8V3h-8z" />
-            </svg>
-          ), 
-          href: "/startup_pages/dashboard" 
-        },
-      ]
-    },
-    {
-      category: "Public",
-      items: [
-        { 
-          name: "Public Home", 
-          icon: (
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-              <path d="M3 12l9-9 9 9" />
-              <path d="M9 21V9h6v12" />
-            </svg>
-          ), 
-          href: "/" 
-        },
-        { 
-          name: "Catalog", 
-          icon: (
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-              <path d="M3 12l9-9 9 9" />
-              <path d="M9 21V9h6v12" />
-            </svg>
-          ), 
-          href: "/public_pages/catalog" 
-        },
-        { 
-          name: "Pitch Deck", 
+        {
+          name: "Pitch Deck",
           icon: (
             <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
               <path d="M12 20h9" />
@@ -106,8 +110,22 @@ export default function SideNavbar() {
               <path d="M4 16h16" />
               <path d="M4 12h16" />
             </svg>
-          ), 
-          href: "/public_pages/pitch-deck" 
+          ),
+          href: "/admin_pages/pitch-deck"
+        },
+      ],
+    },
+    {
+      category: "Startup",
+      items: [
+        {
+          name: "Startup Dashboard",
+          icon: (
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+              <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8v-10h-8v10zm0-18v6h8V3h-8z" />
+            </svg>
+          ),
+          href: "/startup_pages/dashboard"
         },
         {
           name: "Messages",
@@ -116,23 +134,68 @@ export default function SideNavbar() {
               <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
             </svg>
           ),
-          href: "/public_pages/messages"
+          href: "/startup_pages/messaging"
         },
-      ]
+      ],
+    },
+    {
+      category: "Public",
+      items: [
+        {
+          name: "Home",
+          icon: (
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+              <path d="M3 12l9-9 9 9" />
+              <path d="M9 21V9h6v12" />
+            </svg>
+          ),
+          href: "/"
+        },
+        {
+          name: "Catalog",
+          icon: (
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+              <path d="M3 12l9-9 9 9" />
+              <path d="M9 21V9h6v12" />
+            </svg>
+          ),
+          href: "/public_pages/catalog"
+        },
+      ],
     },
   ];
-  type NavItem = { name: string; icon: ReactNode; href: string };
-  const navItems: NavItem[] = navSections.flatMap(section => section.items as NavItem[]);
+
+  const filteredNavSections = navSections.map((section) => {
+    if (section.category === "Admin" && userRole !== "admin") {
+      return { ...section, items: [] };
+    }
+    if (section.category === "Startup" && userRole !== "founder") {
+      return { ...section, items: [] };
+    }
+    return section;
+  });
+
+  const navItems: NavItem[] = filteredNavSections.flatMap((section) => section.items);
 
   return (
-    <aside className={`fixed inset-y-0 left-0 z-20 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 transition-all duration-300 ${open ? "w-56" : "w-16"}`}>
+    <aside
+      className={`fixed inset-y-0 left-0 z-20 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 transition-all duration-300 ${
+        open ? "w-56" : "w-16"
+      }`}
+    >
       <div className="flex items-center justify-end px-4 py-4 border-b border-gray-200 dark:border-gray-800">
         <button
           className="ml-auto p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition"
-          onClick={() => setOpen(v => !v)}
+          onClick={() => setOpen((v) => !v)}
           aria-label={open ? "Hide sidebar" : "Show sidebar"}
         >
-          <svg className={`w-6 h-6 transition-transform ${open ? "" : "rotate-180"}`} fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+          <svg
+            className={`w-6 h-6 transition-transform ${open ? "" : "rotate-180"}`}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+            viewBox="0 0 24 24"
+          >
             <path d="M19 12H5" />
             <path d="M12 5l-7 7 7 7" />
           </svg>
@@ -143,9 +206,46 @@ export default function SideNavbar() {
         <ul className="flex flex-col gap-2">
           <li key="login-or-account">
             {loading ? (
-              <div className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-gray-700 dark:text-gray-200 transition ${open ? "" : "justify-center"}`}>
-                <span className={`transition-all duration-200 ${open ? "opacity-100 ml-2" : "opacity-0 w-0 ml-0 pointer-events-none"}`}>
-                  ...
+              <div
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-gray-700 dark:text-gray-200 transition ${
+                  open ? "" : "justify-center"
+                }`}
+              >
+                <span className="relative w-6 h-6 flex items-center justify-center">
+                  <svg
+                    className="w-6 h-6 animate-spin-slow"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                  >
+                    <circle
+                      className="opacity-20"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      d="M22 12a10 10 0 0 1-10 10"
+                      stroke="url(#loading-gradient)"
+                      strokeWidth="4"
+                      strokeLinecap="round"
+                      fill="none"
+                    />
+                    <defs>
+                      <linearGradient id="loading-gradient" x1="12" y1="2" x2="12" y2="22" gradientUnits="userSpaceOnUse">
+                        <stop stopColor="#60a5fa" />
+                        <stop offset="1" stopColor="#a5b4fc" />
+                      </linearGradient>
+                    </defs>
+                  </svg>
+                </span>
+                <span
+                  className={`transition-all duration-200 ${
+                    open ? "opacity-100 ml-2" : "opacity-0 w-0 ml-0 pointer-events-none"
+                  }`}
+                >
+                  Login
                 </span>
               </div>
             ) : user && open ? (
@@ -153,21 +253,51 @@ export default function SideNavbar() {
                 <AccountDropdown userId={user.id} />
               </div>
             ) : (
-              <a href="/public_pages/login" className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition ${open ? "" : "justify-center"}`} title="Login">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                  <path d="M3 12l9-9 9 9" />
-                  <path d="M9 21V9h6v12" />
+              <a
+                href="/public_pages/login"
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition ${
+                  open ? "" : "justify-center"
+                }`}
+                title="Login"
+              >
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  viewBox="0 0 24 24"
+                >
+                  <circle cx="12" cy="8" r="4" />
+                  <path d="M4 20c0-4 4-7 8-7s8 3 8 7" />
                 </svg>
-                <span className={`transition-all duration-200 ${open ? "opacity-100 ml-2" : "opacity-0 w-0 ml-0 pointer-events-none"}`}>Login</span>
+                <span
+                  className={`transition-all duration-200 ${
+                    open ? "opacity-100 ml-2" : "opacity-0 w-0 ml-0 pointer-events-none"
+                  }`}
+                >
+                  Login
+                </span>
               </a>
             )}
           </li>
 
-          {navItems.map(item => (
-            <li key={item.name}>
-              <a href={item.href} className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition ${open ? "" : "justify-center"}`} title={item.name}>
-                {item.icon}
-                <span className={`transition-all duration-200 ${open ? "opacity-100 ml-2" : "opacity-0 w-0 ml-0 pointer-events-none"}`}>{item.name}</span>
+          {navItems.map((item) => (
+            <li key={(item as any).name}>
+              <a
+                href={(item as any).href}
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition ${
+                  open ? "" : "justify-center"
+                }`}
+                title={(item as any).name}
+              >
+                {(item as any).icon}
+                <span
+                  className={`transition-all duration-200 ${
+                    open ? "opacity-100 ml-2" : "opacity-0 w-0 ml-0 pointer-events-none"
+                  }`}
+                >
+                  {(item as any).name}
+                </span>
               </a>
             </li>
           ))}
