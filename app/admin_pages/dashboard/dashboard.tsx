@@ -66,54 +66,52 @@ const [error, setError] = useState<string | null>(null);
     return <div className="p-6 text-red-500">Erreur : {error}</div>;
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-10" style={{ backgroundColor: "#1A1D21" }}>
-      <header className="mb-8">
-        <h1 className="text-2xl font-semibold tracking-tight">Admin Dashboard</h1>
-      </header>
+    <>
+      <main className="mx-auto max-w-6xl px-4 py-10" style={{ backgroundColor: "#1A1D21" }}>
+        <header className="mb-8">
+          <h1 className="text-2xl font-semibold tracking-tight">Admin Dashboard</h1>
+        </header>
 
-      {/* Graphics */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-gray shadow rounded-lg p-5">
-          <h2 className="text-lg font-semibold mb-4">Budget Breakdown</h2>
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie
-                data={pieData}
-                dataKey="value"
-                cx="50%"
-                cy="50%"
-                outerRadius={100}
-                label
-              >
-                {pieData.map((_, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip />
-            </PieChart>
-          </ResponsiveContainer>
+        {/* Graphics */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="bg-gray shadow rounded-lg p-5">
+            <h2 className="text-lg font-semibold mb-4">Budget Breakdown</h2>
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={pieData}
+                  dataKey="value"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={100}
+                  label
+                >
+                  {pieData.map((_, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+          <div className="bg-gray shadow rounded-lg p-5">
+            <h2 className="text-lg font-semibold mb-4">Views & Sales per Month</h2>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={barData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="views" fill="#3b82f6" />
+                <Bar dataKey="sales" fill="#10b981" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         </div>
-        {/* Other graphs can be added here */}
-      </div>
-    </main>
-
-        <div className="bg-gray shadow rounded-lg p-5">
-          <h2 className="text-lg font-semibold mb-4">Views & Sales per Month</h2>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={barData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey="views" fill="#3b82f6" />
-              <Bar dataKey="sales" fill="#10b981" />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
+      </main>
 
       {/* AdminDashboardPage devant */}
-      <div className="relative top-6 left-6 w-full lg:w-1/3 bg-gray shadow-lg rounded-xl p-6 z-20">
+      <div className="relative top-6 left-94 w-full lg:w-1/3 bg-gray shadow-lg rounded-xl p-6 z-20">
         <h1 className="text-2xl font-bold mb-4">Admin Dashboard</h1>
         {statistics.map((stat, idx) => (
           <div key={idx} className="mb-4">
@@ -127,6 +125,6 @@ const [error, setError] = useState<string | null>(null);
           </div>
         ))}
       </div>
-    </div>
+    </>
   );
 }
