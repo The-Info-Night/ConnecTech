@@ -66,8 +66,12 @@ const [error, setError] = useState<string | null>(null);
     return <div className="p-6 text-red-500">Erreur : {error}</div>;
 
   return (
-    <div className="relative p-6 left-6 bg-dark-100 min-h-screen">
-      {/* Charts derrière */}
+    <main className="mx-auto max-w-6xl px-4 py-10" style={{ backgroundColor: "#1A1D21" }}>
+      <header className="mb-8">
+        <h1 className="text-2xl font-semibold tracking-tight">Admin Dashboard</h1>
+      </header>
+
+      {/* Graphics */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-gray shadow rounded-lg p-5">
           <h2 className="text-lg font-semibold mb-4">Budget Breakdown</h2>
@@ -89,6 +93,9 @@ const [error, setError] = useState<string | null>(null);
             </PieChart>
           </ResponsiveContainer>
         </div>
+        {/* Other graphs can be added here */}
+      </div>
+    </main>
 
         <div className="bg-gray shadow rounded-lg p-5">
           <h2 className="text-lg font-semibold mb-4">Views & Sales per Month</h2>
