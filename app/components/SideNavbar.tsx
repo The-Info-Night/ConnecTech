@@ -97,15 +97,6 @@ const NAV_SECTIONS: { category: string; items: NavItem[] }[] = [
         ),
         href: "/public_pages/catalog"
       },
-      {
-        name: "Pitch Deck",
-        icon: (
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-            <path d="M12 20h9" /><path d="M12 4h9" /><path d="M4 8h16" /><path d="M4 16h16" /><path d="M4 12h16" />
-          </svg>
-        ),
-        href: "/public_pages/pitch-deck"
-      },
     ]
   },
 ];
