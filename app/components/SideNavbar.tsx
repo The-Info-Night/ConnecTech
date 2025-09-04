@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import type { ReactNode } from "react";
 import AccountDropdown from "./AccountDropdown";
 import { supabase } from "../../supabaseClient";
 
@@ -125,6 +126,8 @@ export default function SideNavbar() {
       ]
     },
   ];
+  type NavItem = { name: string; icon: ReactNode; href: string };
+  const navItems: NavItem[] = navSections.flatMap(section => section.items as NavItem[]);
 
   return (
     <aside className={`fixed inset-y-0 left-0 z-20 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 transition-all duration-300 ${open ? "w-56" : "w-16"}`}>
