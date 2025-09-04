@@ -19,6 +19,8 @@ type DashboardRow = {
 };
 
 export default function DashboardPage() {
+const [loading, setLoading] = useState(true);
+const [error, setError] = useState<string | null>(null);
   const [statistics, setStatistics] = useState<DashboardRow[]>([]);
   const [pieData, setPieData] = useState([
     { name: "Marketing", value: 400 },
@@ -35,15 +37,33 @@ export default function DashboardPage() {
     { name: "May", views: 1890, sales: 4800 },
   ]);
 
+  async function fetchStatistics() {
+    const { data, error } = await supabase
+      .from("data_adm_dashboard")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (error) throw error;
+    return data;
+  }
+
   useEffect(() => {
-    supabase.from("data_adm_dashboard").select("*").limit(1).maybeSingle().then(({ data }) => {
-      if (data) {
-        setStatistics([data]);
-      }
-    });
+    fetchStatistics()
+      .then((data) => {
+        if (data) setStatistics([data]);
+      })
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
   }, []);
 
   const COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444"];
+
+  if (loading)
+    return <div className="p-6">Chargement des statistiques...</div>;
+  if (error)
+    return <div className="p-6 text-red-500">Erreur : {error}</div>;
 
   return (
     <div className="relative p-6 left-6 bg-dark-100 min-h-screen">
