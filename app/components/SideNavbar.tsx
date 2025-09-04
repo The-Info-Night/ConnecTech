@@ -4,6 +4,7 @@ import { useState, useEffect, ReactNode } from "react";
 import Image from "next/image";
 import AccountDropdown from "./AccountDropdown";
 import { supabase } from "../../supabaseClient";
+import { useUserRole } from "../hooks/userRoleContext";
 
 type NavItem = {
   name: string;
@@ -22,7 +23,7 @@ const NAV_SECTIONS: { category: string; items: NavItem[] }[] = [
             <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8v-10h-8v10zm0-18v6h8V3h-8z" />
           </svg>
         ),
-        href: "/admin_pages/dashboard"
+        href: "/admin_pages/dashboard",
       },
       {
         name: "Admin Home",
@@ -32,7 +33,7 @@ const NAV_SECTIONS: { category: string; items: NavItem[] }[] = [
             <path d="M9 21V9h6v12" />
           </svg>
         ),
-        href: "/admin_pages/home"
+        href: "/admin_pages/home",
       },
       {
         name: "Pitch Deck",
@@ -45,7 +46,7 @@ const NAV_SECTIONS: { category: string; items: NavItem[] }[] = [
             <path d="M4 12h16" />
           </svg>
         ),
-        href: "/admin_pages/pitch-deck"
+        href: "/admin_pages/pitch-deck",
       },
     ],
   },
@@ -59,7 +60,7 @@ const NAV_SECTIONS: { category: string; items: NavItem[] }[] = [
             <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8v-10h-8v10zm0-18v6h8V3h-8z" />
           </svg>
         ),
-        href: "/startup_pages/dashboard"
+        href: "/startup_pages/dashboard",
       },
       {
         name: "Messages",
@@ -68,7 +69,7 @@ const NAV_SECTIONS: { category: string; items: NavItem[] }[] = [
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
           </svg>
         ),
-        href: "/startup_pages/messaging"
+        href: "/startup_pages/messaging",
       },
     ],
   },
@@ -83,87 +84,46 @@ const NAV_SECTIONS: { category: string; items: NavItem[] }[] = [
             <path d="M9 21V9h6v12" />
           </svg>
         ),
-        href: "/"
+        href: "/",
       },
       {
         name: "Catalog",
         icon: (
-          <Image
-            src="/catalog.svg"
-            alt="Catalog Icon"
-            width={24}
-            height={24}
-          />
+          <Image src="/catalog.svg" alt="Catalog Icon" width={24} height={24} />
         ),
-        href: "/public_pages/catalog"
+        href: "/public_pages/catalog",
       },
-      { name: "Events",
+      {
+        name: "Events",
         icon: (
           <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
             <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2z" />
           </svg>
         ),
-        href: "/public_pages/events"
-      }
-    ]
+        href: "/public_pages/events",
+      },
+    ],
   },
 ];
 
 export default function SideNavbar() {
   const [open, setOpen] = useState(true);
   const [user, setUser] = useState<any>(null);
-  const [userRole, setUserRole] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+
+  const { userRole, loading } = useUserRole();
 
   useEffect(() => {
     let isMounted = true;
 
-    async function getUserAndRole() {
-      setLoading(true);
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
-      if (userError) {
-        if (isMounted) setUser(null);
-        if (isMounted) setUserRole(null);
-        setLoading(false);
-        return;
-      }
-      if (isMounted) setUser(user);
-
-      if (user?.id) {
-        const { data, error: roleError } = await supabase
-          .from("users")
-          .select("role")
-          .eq("email", user.email)
-          .maybeSingle();
-
-        if (roleError) {
-          if (isMounted) setUserRole(null);
-        } else {
-          if (isMounted) setUserRole(data?.role || null);
-        }
-      } else {
-        if (isMounted) setUserRole(null);
-      }
-      if (isMounted) setLoading(false);
+    async function fetchUser() {
+      const { data: { user }, error } = await supabase.auth.getUser();
+      if (!error && isMounted) setUser(user);
     }
 
-    getUserAndRole();
+    fetchUser();
 
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
-      if (session?.user?.id) {
-        supabase
-          .from("users")
-          .select("role")
-          .eq("email", session.user.email)
-          .maybeSingle()
-          .then(({ data, error }) => {
-            if (!error) setUserRole(data?.role || null);
-            else setUserRole(null);
-          });
-      } else {
-        setUserRole(null);
-      }
     });
 
     return () => {
@@ -220,11 +180,7 @@ export default function SideNavbar() {
                 }`}
               >
                 <span className="relative w-6 h-6 flex items-center justify-center">
-                  <svg
-                    className="w-6 h-6 animate-spin-slow"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                  >
+                  <svg className="w-6 h-6 animate-spin-slow" viewBox="0 0 24 24" fill="none">
                     <circle
                       className="opacity-20"
                       cx="12"
@@ -253,7 +209,7 @@ export default function SideNavbar() {
                     open ? "opacity-100 ml-2" : "opacity-0 w-0 ml-0 pointer-events-none"
                   }`}
                 >
-                  Login
+                  Loading...
                 </span>
               </div>
             ) : user ? (
