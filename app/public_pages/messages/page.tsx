@@ -1,4 +1,4 @@
-import SideNavbar from "../components/SideNavbar";
+import SideNavbar from "../../components/SideNavbar";
 import CatalogMessages from "./catalogMessages";
 
 export default function MessagesPage() {
