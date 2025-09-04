@@ -42,8 +42,7 @@ export default function PitchDeckPage() {
             Connectech Pitch Deck
           </h1>
 
-          {/* Pitch Deck Container */}
-          <div
+{/* Pitch Deck Container */}
 <div
   ref={contentRef}
   className="bg-white p-8 rounded-xl shadow-2xl max-w-4xl w-full"
