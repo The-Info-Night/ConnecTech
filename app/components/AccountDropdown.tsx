@@ -35,13 +35,21 @@ export default function AccountDropdown({ userId }: { userId: string }) {
         onClick={() => setOpen(!open)}
         className="flex items-center gap-3 px-4 py-3 w-full rounded-lg font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition"
       >
-        {/* Avatar for later */}
-        {profile?.avatar_url ? (
-          <img src={profile.avatar_url} alt="Avatar" className="w-6 h-6 rounded-full" />
-        ) : (
-          <div className="w-6 h-6 bg-gray-300 rounded-full" />
-        )}
-        <span>Account</span>
+        <svg
+          className="w-6 h-6"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <circle cx="12" cy="8" r="4" />
+          <path d="M4 20c0-4 4-7 8-7s8 3 8 7" />
+        </svg>
+        <span
+          className="transition-all duration-200 ml-2"
+        >
+          Account
+        </span>
         <svg
           className={`w-4 h-4 transition-transform ${open ? "rotate-180" : ""}`}
           fill="none"
