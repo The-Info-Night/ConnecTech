@@ -5,15 +5,20 @@ interface ProjectCardProps {
   title: string;
   description: string;
   subtitle?: string;
+  onClick?: () => void;
 }
 
 export default function ProjectCard({
   title,
   description,
   subtitle,
+  onClick,
 }: ProjectCardProps) {
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden transition-all duration-300 transform hover:scale-105">
+    <div 
+      className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden transition-all duration-300 transform hover:scale-105 cursor-pointer"
+      onClick={onClick}
+    >
       <div className="relative h-48">
       </div>
       <div className="p-6">
