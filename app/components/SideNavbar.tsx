@@ -106,6 +106,16 @@ const NAV_SECTIONS: { category: string; items: NavItem[] }[] = [
   },
 ];
 
+const INVESTOR_MESSAGES_ITEM: NavItem = {
+  name: "Messages",
+  icon: (
+    <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+    </svg>
+  ),
+  href: "/startup_pages/messaging",
+};
+
 export default function SideNavbar() {
   const [open, setOpen] = useState(true);
   const [user, setUser] = useState<any>(null);
@@ -114,18 +124,14 @@ export default function SideNavbar() {
 
   useEffect(() => {
     let isMounted = true;
-
     async function fetchUser() {
       const { data: { user }, error } = await supabase.auth.getUser();
       if (!error && isMounted) setUser(user);
     }
-
     fetchUser();
-
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
     });
-
     return () => {
       isMounted = false;
       listener?.subscription.unsubscribe();
@@ -142,7 +148,14 @@ export default function SideNavbar() {
     return section;
   });
 
-  const navItems: NavItem[] = filteredNavSections.flatMap((section) => section.items);
+  let navItems: NavItem[] = filteredNavSections.flatMap((section) => section.items);
+
+  if (userRole === "investor") {
+    const alreadyPresent = navItems.some(item => item.href === INVESTOR_MESSAGES_ITEM.href);
+    if (!alreadyPresent) {
+      navItems = [INVESTOR_MESSAGES_ITEM, ...navItems];
+    }
+  }
 
   return (
     <aside
@@ -171,46 +184,20 @@ export default function SideNavbar() {
 
       <nav className="mt-4">
         <ul className="flex flex-col gap-2">
-          {/* Login/Account logic */}
           <li key="login-or-account">
             {loading ? (
-              <div
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-gray-700 dark:text-gray-200 transition ${
-                  open ? "" : "justify-center"
-                }`}
-              >
-                <span className="relative w-6 h-6 flex items-center justify-center">
-                  <svg className="w-6 h-6 animate-spin-slow" viewBox="0 0 24 24" fill="none">
-                    <circle
-                      className="opacity-20"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    />
-                    <path
-                      d="M22 12a10 10 0 0 1-10 10"
-                      stroke="url(#loading-gradient)"
-                      strokeWidth="4"
-                      strokeLinecap="round"
-                      fill="none"
-                    />
-                    <defs>
-                      <linearGradient id="loading-gradient" x1="12" y1="2" x2="12" y2="22" gradientUnits="userSpaceOnUse">
-                        <stop stopColor="#60a5fa" />
-                        <stop offset="1" stopColor="#a5b4fc" />
-                      </linearGradient>
-                    </defs>
-                  </svg>
-                </span>
-                <span
-                  className={`transition-all duration-200 ${
-                    open ? "opacity-100 ml-2" : "opacity-0 w-0 ml-0 pointer-events-none"
-                  }`}
-                >
-                  Loading...
-                </span>
+              <div className="flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-gray-700 dark:text-gray-200 transition justify-center">
+                <svg className="w-6 h-6 animate-spin-slow" viewBox="0 0 24 24" fill="none">
+                  <circle className="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path d="M22 12a10 10 0 0 1-10 10" stroke="url(#loading-gradient)" strokeWidth="4" strokeLinecap="round" fill="none" />
+                  <defs>
+                    <linearGradient id="loading-gradient" x1="12" y1="2" x2="12" y2="22" gradientUnits="userSpaceOnUse">
+                      <stop stopColor="#60a5fa" />
+                      <stop offset="1" stopColor="#a5b4fc" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+                <span>Loading...</span>
               </div>
             ) : user ? (
               <div className={`flex items-center ${open ? "" : "justify-center"}`}>
