@@ -1,7 +1,8 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import ProjectCard from "./ProjectCard";
-import { getRows, getStartups, searchStartups, getDistinctValues, getFilteredStartups } from "@/lib/supabaseServices";
+import { getRows, getStartups, searchStartups, getDistinctValues, getFilteredStartups, getRowById } from "@/lib/supabaseServices";
+import StartupModal from "./StartupModal";
 
 type Startup = {
   id: number;
@@ -10,6 +11,14 @@ type Startup = {
   sector?: string | null;
   needs?: string | null;
   project_status?: string | null;
+  website_url?: string | null;
+  legal_status?: string | null;
+  address?: string | null;
+  email?: string | null;
+  phone?: string | null;
+  social_media_url?: string | null;
+  maturity?: string | null;
+  founders?: string[] | null;
 };
 
 export default function ProjectsCatalog() {
@@ -21,6 +30,8 @@ export default function ProjectsCatalog() {
   const [status, setStatus] = useState<string>("");
   const [sectors, setSectors] = useState<string[]>([]);
   const [statuses, setStatuses] = useState<string[]>([]);
+  const [selectedStartup, setSelectedStartup] = useState<Startup | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const debouncedQuery = useDebouncedValue(query, 300);
 
@@ -34,7 +45,7 @@ export default function ProjectsCatalog() {
       try {
         const hasFilters = (sector && sector !== "") || (status && status !== "");
         if (debouncedQuery.trim().length === 0 && !hasFilters) {
-          const data = await getRows<Startup>("startups", "id,name,description,sector,project_status");
+          const data = await getRows<Startup>("startups", "id,name,description,sector,project_status,website_url,legal_status,address,email,phone,social_media_url,maturity,needs,founders");
           if (!isCancelled) setStartups(data);
         } else {
           const data = await getFilteredStartups({
@@ -81,6 +92,18 @@ export default function ProjectsCatalog() {
       isCancelled = true;
     };
   }, []);
+
+  const handleCardClick = async (startupId: number) => {
+    try {
+      const fullStartup = await getRowById<Startup>("startups", startupId, "id,name,description,sector,needs,project_status,website_url,legal_status,address,email,phone,social_media_url,maturity,founders");
+      if (fullStartup) {
+        setSelectedStartup(fullStartup);
+        setIsModalOpen(true);
+      }
+    } catch (e) {
+      console.error("Error fetching startup details:", e);
+    }
+  };
 
   return (
     <div className="container mx-auto py-10 w-full">
@@ -133,10 +156,20 @@ export default function ProjectsCatalog() {
               title={startup.name}
               description={startup.description ?? ""}
               subtitle={[startup.sector, startup.project_status].filter(Boolean).join(" • ")}
+              onClick={() => handleCardClick(startup.id)}
             />
           ))}
         </div>
       )}
+
+      <StartupModal
+        startup={selectedStartup}
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setSelectedStartup(null);
+        }}
+      />
     </div>
   );
 }
