@@ -9,6 +9,8 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.57.0",
+    "color-space": "^2.3.2",
+    "culori": "^4.0.2",
     "html2canvas": "^1.4.1",
     "jspdf": "^3.0.2",
     "next": "15.5.2",
