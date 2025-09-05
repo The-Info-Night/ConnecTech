@@ -1,43 +1,151 @@
 "use client";
+import { useEffect, useMemo, useState } from "react";
 import ProjectCard from "./ProjectCard";
+import { getRows, getStartups, searchStartups, getDistinctValues, getFilteredStartups } from "@/lib/supabaseServices";
 
-const projects = [
-  {
-    id: 1,
-    title: "Project 1",
-    description: "A fantastic description for project 1.",
-    image: "/logo.png",
-  },
-  {
-    id: 2,
-    title: "Project 2",
-    description: "A short and sweet description for project 2.",
-    image: "/next.svg",
-  },
-  {
-    id: 3,
-    title: "Project 3",
-    description: "A descriptive description for project 3.",
-    image: "/vercel.svg",
-  },
-];
+type Startup = {
+  id: number;
+  name: string;
+  description?: string | null;
+  sector?: string | null;
+  needs?: string | null;
+  project_status?: string | null;
+};
 
 export default function ProjectsCatalog() {
+  const [query, setQuery] = useState("");
+  const [startups, setStartups] = useState<Startup[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [sector, setSector] = useState<string>("");
+  const [status, setStatus] = useState<string>("");
+  const [sectors, setSectors] = useState<string[]>([]);
+  const [statuses, setStatuses] = useState<string[]>([]);
+
+  const debouncedQuery = useDebouncedValue(query, 300);
+
+  useEffect(() => {
+    let isCancelled = false;
+
+    async function fetchStartups() {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const hasFilters = (sector && sector !== "") || (status && status !== "");
+        if (debouncedQuery.trim().length === 0 && !hasFilters) {
+          const data = await getRows<Startup>("startups", "id,name,description,sector,project_status");
+          if (!isCancelled) setStartups(data);
+        } else {
+          const data = await getFilteredStartups({
+            sector: sector || null,
+            project_status: status || null,
+            search: debouncedQuery || null,
+            limit: 200,
+          });
+          if (!isCancelled) setStartups(data);
+        }
+      } catch (e: unknown) {
+        const anyErr = e as { message?: string } | null;
+        const message = anyErr?.message ?? "Unknown error";
+        console.error("Startup fetch/search error:", e);
+        if (!isCancelled) setError(message);
+      } finally {
+        if (!isCancelled) setLoading(false);
+      }
+    }
+
+    fetchStartups();
+    return () => {
+      isCancelled = true;
+    };
+  }, [debouncedQuery, sector, status]);
+
+  useEffect(() => {
+    let isCancelled = false;
+    async function loadOptions() {
+      try {
+        const [sectorsData, statusesData] = await Promise.all([
+          getDistinctValues("startups", "sector"),
+          getDistinctValues("startups", "project_status"),
+        ]);
+        if (!isCancelled) {
+          setSectors(sectorsData);
+          setStatuses(statusesData);
+        }
+      } catch (e) {
+      }
+    }
+    loadOptions();
+    return () => {
+      isCancelled = true;
+    };
+  }, []);
+
   return (
-    <div className="container mx-auto py-10">
-      <h2 className="text-2xl md:text-4xl font-extrabold text-center mb-10 text-gray-900 dark:text-gray-100">
-        Developer Catalog
+    <div className="container mx-auto py-10 w-full">
+      <h2 className="text-2xl md:text-4xl font-extrabold text-center mb-6 text-gray-900 dark:text-gray-100">
+        Catalog des Startups
       </h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 px-4">
-        {projects.map((project) => (
-          <ProjectCard
-            key={project.id}
-            title={project.title}
-            description={project.description}
-            imageSrc={project.image}
-          />
-        ))}
+
+      <div className="w-full max-w-4xl mx-auto px-4 mb-8 grid grid-cols-1 md:grid-cols-4 gap-3">
+        <input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Rechercher une startup par nom ou description..."
+          className="md:col-span-2 w-full rounded-lg bg-white/90 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 px-4 py-3 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <select
+          value={sector}
+          onChange={(e) => setSector(e.target.value)}
+          className="w-full rounded-lg bg-white/90 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 px-4 py-3 text-gray-900 dark:text-gray-100 focus:outline-none"
+        >
+          <option value="">Secteur (tous)</option>
+          {sectors.map((s) => (
+            <option key={s} value={s}>{s}</option>
+          ))}
+        </select>
+        <select
+          value={status}
+          onChange={(e) => setStatus(e.target.value)}
+          className="w-full rounded-lg bg-white/90 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 px-4 py-3 text-gray-900 dark:text-gray-100 focus:outline-none"
+        >
+          <option value="">Statut (tous)</option>
+          {statuses.map((s) => (
+            <option key={s} value={s}>{s}</option>
+          ))}
+        </select>
       </div>
+
+      {error && (
+        <p className="text-center text-red-500 mb-6 px-4">{error}</p>
+      )}
+
+      {loading ? (
+        <p className="text-center text-gray-400">Chargement...</p>
+      ) : startups.length === 0 ? (
+        <p className="text-center text-gray-400">Aucun résultat</p>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 px-4">
+          {startups.map((startup) => (
+            <ProjectCard
+              key={startup.id}
+              title={startup.name}
+              description={startup.description ?? ""}
+              subtitle={[startup.sector, startup.project_status].filter(Boolean).join(" • ")}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
+}
+
+function useDebouncedValue(value: string, delayMs: number) {
+  const [debounced, setDebounced] = useState(value);
+  useEffect(() => {
+    const id = setTimeout(() => setDebounced(value), delayMs);
+    return () => clearTimeout(id);
+  }, [value, delayMs]);
+  return debounced;
 }
