@@ -3,6 +3,7 @@ import { useRef } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import Link from "next/link";
+import { Download } from "lucide-react";
 
 export default function PitchDeckPage() {
     const contentRef = useRef<HTMLDivElement | null>(null);
@@ -271,14 +272,15 @@ export default function PitchDeckPage() {
           </div>
 
           <div className="group mt-8">
-              <Link
-                href="/pitch-deck-c.pdf"
-                download
-                className="px-6 py-3 rounded-lg bg-blue-600 text-white font-bold hover:bg-blue-700"
-              >
-                Télécharger le Pitch Deck
-              </Link>
-            </div>
+            <Link
+              href="/pitch-deck-c.pdf"
+              download
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-white text-black font-bold shadow hover:bg-gray-100 transition"
+            >
+              <Download className="w-5 h-5" />
+              Extract as PDF
+            </Link>
+          </div>
         </main>
 
         <style jsx global>{`
