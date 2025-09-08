@@ -20,6 +20,17 @@ type Conversation = {
   lastMessage: Message | null;
 };
 
+function useMobileBreakpoint(breakpoint = 768) {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const update = () => setIsMobile(window.innerWidth < breakpoint);
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, [breakpoint]);
+  return isMobile;
+}
+
 export default function CatalogMessages() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -27,6 +38,9 @@ export default function CatalogMessages() {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [newMessage, setNewMessage] = useState("");
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+
+  const isMobile = useMobileBreakpoint();
+  const [showConversationPage, setShowConversationPage] = useState(false);
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -41,9 +55,7 @@ export default function CatalogMessages() {
   useEffect(() => {
     const fetchUsers = async () => {
       const { data, error } = await supabase.from("users").select("id, name");
-      if (!error && data) {
-        setUsers(data);
-      }
+      if (!error && data) setUsers(data);
     };
     fetchUsers();
   }, []);
@@ -63,33 +75,12 @@ export default function CatalogMessages() {
           const partnerId =
             msg.sender_id === currentUser.id ? msg.receiver_id : msg.sender_id;
           if (!partnersMap[partnerId]) {
-            const user = users.find((u) => u.id === partnerId);
-            if (user) {
-              partnersMap[partnerId] = {
-                user,
-                lastMessage: msg,
-              };
-            }
+            const user = users.find((u) => u.id === partnerId) ?? { id: partnerId, name: partnerId };
+            partnersMap[partnerId] = { user, lastMessage: msg };
           }
         });
-
-        if (users.length === 0) {
-          messagesData.forEach((msg: Message) => {
-            const partnerId =
-              msg.sender_id === currentUser.id ? msg.receiver_id : msg.sender_id;
-            if (!partnersMap[partnerId]) {
-              partnersMap[partnerId] = {
-                user: { id: partnerId, name: partnerId },
-                lastMessage: msg,
-              };
-            }
-          });
-        }
-
         const convArr = Object.values(partnersMap).sort((a, b) =>
-          (b.lastMessage?.created_at || "") > (a.lastMessage?.created_at || "")
-            ? 1
-            : -1
+          (b.lastMessage?.created_at || "") > (a.lastMessage?.created_at || "") ? 1 : -1
         );
         setConversations(convArr);
       }
@@ -110,9 +101,7 @@ export default function CatalogMessages() {
           `and(sender_id.eq.${currentUser.id},receiver_id.eq.${selectedUser.id}),and(sender_id.eq.${selectedUser.id},receiver_id.eq.${currentUser.id})`
         )
         .order("created_at", { ascending: true });
-      if (!error && data) {
-        setMessages(data);
-      }
+      if (!error && data) setMessages(data);
     };
     fetchMessages();
   }, [selectedUser, currentUser]);
@@ -120,7 +109,7 @@ export default function CatalogMessages() {
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newMessage.trim() || !selectedUser || !currentUser) return;
-    const { data, error } = await supabase.from("messages").insert([
+    const { error } = await supabase.from("messages").insert([
       {
         sender_id: currentUser.id,
         receiver_id: selectedUser.id,
@@ -129,74 +118,134 @@ export default function CatalogMessages() {
     ]);
     if (!error) {
       setNewMessage("");
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: Date.now(),
-          sender_id: currentUser.id,
-          receiver_id: selectedUser.id,
-          content: newMessage,
-          created_at: new Date().toISOString(),
-        },
-      ]);
+      const newMsg: Message = {
+        id: Date.now(),
+        sender_id: currentUser.id,
+        receiver_id: selectedUser.id,
+        content: newMessage,
+        created_at: new Date().toISOString(),
+      };
+      setMessages((prev) => [...prev, newMsg]);
       setConversations((prev) => {
         const idx = prev.findIndex((c) => c.user.id === selectedUser.id);
-        const newConv: Conversation = {
-          user: selectedUser,
-          lastMessage: {
-            id: Date.now(),
-            sender_id: currentUser.id,
-            receiver_id: selectedUser.id,
-            content: newMessage,
-            created_at: new Date().toISOString(),
-          },
-        };
-        let updated = prev.filter((c) => c.user.id !== selectedUser.id);
-        return [newConv, ...updated];
+        const newConv: Conversation = { user: selectedUser, lastMessage: newMsg };
+        if (idx !== -1) prev.splice(idx, 1);
+        return [newConv, ...prev];
       });
     }
   };
 
-  const getUserName = (user: User) => user.name || user.id;
+  const openConversation = (user: User) => {
+    setSelectedUser(user);
+    if (isMobile) setShowConversationPage(true);
+  };
+  const closeConversation = () => {
+    setShowConversationPage(false);
+    setSelectedUser(null);
+  };
+
+  if (isMobile) {
+    if (!showConversationPage || !selectedUser) {
+      return (
+        <div className="flex flex-col h-[80vh] w-full bg-neutral-900 text-white">
+          <div className="p-4 border-b border-neutral-700 bg-neutral-900 font-semibold text-lg">Conversations</div>
+          <ul className="flex-1 overflow-y-auto">
+            {conversations.length === 0 && <li className="p-4 text-neutral-300 text-sm">No conversations yet.</li>}
+            {conversations.map((conv) => (
+              <li
+                key={conv.user.id}
+                className="flex items-center gap-3 px-4 py-3 border-b cursor-pointer hover:bg-red-900"
+                onClick={() => openConversation(conv.user)}
+              >
+                <div className="w-10 h-10 rounded-full bg-red-500 flex items-center justify-center font-bold uppercase">
+                  {conv.user.name.slice(0,2)}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="font-medium truncate">{conv.user.name}</div>
+                  <div className="text-xs text-neutral-400 truncate">{conv.lastMessage?.content || "No messages yet"}</div>
+                </div>
+                {conv.lastMessage && (
+                  <div className="text-xs text-neutral-300 ml-2">
+                    {new Date(conv.lastMessage.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                  </div>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      );
+    }
+    return (
+      <div className="flex flex-col h-[80vh] w-full bg-neutral-900 text-white">
+        <div className="flex items-center p-3 border-b border-neutral-700 bg-neutral-900">
+          <button className="mr-4 text-2xl font-bold" onClick={closeConversation} aria-label="Retour">{'←'}</button>
+          <div className="w-10 h-10 rounded-full bg-red-500 flex items-center justify-center font-bold uppercase">
+            {selectedUser.name.slice(0,2)}
+          </div>
+          <span className="ml-3 font-semibold">{selectedUser.name}</span>
+        </div>
+        <div className="flex-1 p-3 overflow-y-auto">
+          {messages.length === 0 && <div className="text-neutral-400 text-sm">No messages yet. Say hello!</div>}
+          {messages.map((msg) => (
+            <div
+              key={msg.id}
+              className={`flex ${msg.sender_id === currentUser?.id ? "justify-end" : "justify-start"} mb-1`}
+            >
+              <div
+                className={`px-3 py-2 rounded-lg max-w-xs break-words ${
+                  msg.sender_id === currentUser?.id ? "bg-red-500 text-white" : "bg-red-200 dark:bg-red-700"
+                }`}
+              >
+                <div className="text-sm">{msg.content}</div>
+                <div className="text-xs text-neutral-400 mt-1 text-right">
+                  {new Date(msg.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+        <form onSubmit={handleSend} className="p-3 border-t bg-neutral-700 flex gap-2 items-center">
+          <input
+            type="text"
+            className="flex-1 bg-neutral-800 rounded px-3 py-2 text-white"
+            placeholder="Type your message..."
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+          />
+          <button type="submit" className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white font-semibold">
+            Send
+          </button>
+        </form>
+      </div>
+    );
+  }
 
   return (
-    <div className="flex h-[80vh] border rounded-lg overflow-hidden bg-neutral-900">
-      <nav className="w-64 min-w-[16rem] max-w-xs border-r bg-neutral-900 flex flex-col">
-        <div className="p-4 border-b" style={{ backgroundColor: "#111111" }}>
-          <h2 className="font-semibold text-lg">Conversations</h2>
-        </div>
+    <div className="flex h-[80vh] w-full border rounded-lg overflow-hidden bg-neutral-900 text-white">
+      {/* Sidebar */}
+      <nav className="w-64 min-w-[16rem] max-w-xs border-r border-neutral-700 bg-neutral-900 flex flex-col">
+        <div className="p-4 border-b border-neutral-700 bg-neutral-900 font-semibold text-lg">Conversations</div>
         <ul className="flex-1 overflow-y-auto">
-          {conversations.length === 0 && (
-            <li className="p-4 text-neutral-300 text-sm">No conversations yet.</li>
-          )}
+          {conversations.length === 0 && <li className="p-4 text-neutral-300 text-sm">No conversations yet.</li>}
           {conversations.map((conv) => (
             <li
               key={conv.user.id}
-              className={`flex items-center gap-2 px-4 py-3 cursor-pointer border-b last:border-b-0
-                ${
-                  selectedUser?.id === conv.user.id
-                    ? "bg-red-200 dark:bg-red-700"
-                    : "hover:bg-red-200 dark:hover:bg-red-700"
-                }`}
-              onClick={() => setSelectedUser(conv.user)}
+              className={`flex items-center gap-3 px-4 py-3 border-b cursor-pointer ${selectedUser?.id === conv.user.id ? "bg-red-900" : "hover:bg-red-700"}`}
+              onClick={() => {
+                setSelectedUser(conv.user);
+                setShowConversationPage(true);
+              }}
             >
-              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-red-400 text-white flex items-center justify-center font-bold uppercase">
-                {getUserName(conv.user).slice(0, 2)}
+              <div className="w-10 h-10 rounded-full bg-red-500 flex items-center justify-center font-bold uppercase">
+                {conv.user.name.slice(0,2)}
               </div>
-              <div className="flex-1 min-w-0">
-                <div className="font-medium truncate">{getUserName(conv.user)}</div>
-                <div className="text-xs text-neutral-400 truncate">
-                  {conv.lastMessage
-                    ? conv.lastMessage.content
-                    : "No messages yet"}
-                </div>
+              <div className="min-w-0 flex-1">
+                <div className="font-medium truncate">{conv.user.name}</div>
+                <div className="text-xs text-neutral-400 truncate">{conv.lastMessage?.content || "No messages yet"}</div>
               </div>
               {conv.lastMessage && (
-                <div className="text-xs text-neutral-300 ml-2 whitespace-nowrap">
-                  {new Date(conv.lastMessage.created_at).toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
+                <div className="text-xs text-neutral-300 ml-2">
+                  {new Date(conv.lastMessage.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                 </div>
               )}
             </li>
@@ -209,11 +258,9 @@ export default function CatalogMessages() {
             <>
               <div className="flex items-center gap-2 mb-4 border-b pb-2">
                 <div className="w-10 h-10 rounded-full bg-red-400 text-white flex items-center justify-center font-bold uppercase">
-                  {getUserName(selectedUser).slice(0, 2)}
+                  {selectedUser.name.slice(0,2)}
                 </div>
-                <h3 className="font-semibold text-lg">
-                  {getUserName(selectedUser)}
-                </h3>
+                <h3 className="font-semibold text-lg">{selectedUser.name}</h3>
               </div>
               <div className="space-y-2">
                 {messages.length === 0 && (
@@ -224,11 +271,7 @@ export default function CatalogMessages() {
                 {messages.map((msg) => (
                   <div
                     key={msg.id}
-                    className={`flex ${
-                      msg.sender_id === currentUser?.id
-                        ? "justify-end"
-                        : "justify-start"
-                    }`}
+                    className={`flex ${msg.sender_id === currentUser?.id ? "justify-end" : "justify-start"}`}
                   >
                     <div
                       className={`px-3 py-2 rounded-lg max-w-xs break-words ${
