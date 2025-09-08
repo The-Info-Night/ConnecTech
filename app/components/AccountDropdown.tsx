@@ -53,7 +53,7 @@ export default function AccountDropdown({ userId, sidebarOpen, onOpenSidebar }: 
       {open && sidebarOpen && (
         <div className="absolute left-0 top-full w-full mt-1 rounded-lg shadow-lg bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 z-10">
           <button
-            onClick={() => router.push("/profile")}
+            onClick={() => router.push("/public_pages/profile")}
             className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 flex cursor-pointer items-center gap-2"
           >
             <span>Profile</span>
