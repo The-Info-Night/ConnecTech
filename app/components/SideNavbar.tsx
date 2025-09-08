@@ -129,34 +129,25 @@ export default function SideNavbar() {
   const [open, setOpen] = useState(true);
   const [user, setUser] = useState<any>(null);
 
-  const { userRole, loading, setUserRole, setLoading } = useUserRole();
+  const { userRole, loading } = useUserRole();
 
   useEffect(() => {
     let isMounted = true;
 
     async function getUserAndRole() {
-      setLoading(true);
+      setLocalLoading(true);
       const { data: { user }, error: userError } = await supabase.auth.getUser();
       if (userError) { 
-        if (isMounted) { setUser(null); setUserRole(null); } 
-        setLoading(false); 
+        if (isMounted) { setUser(null); } 
+        setLocalLoading(false); 
         return; 
       }
       if (isMounted) setUser(user);
 
-      if (user?.id) {
-        const { data, error: roleError } = await supabase
-          .from("users")
-          .select("role")
-          .eq("email", user.email)
-          .maybeSingle();
-        if (!roleError && isMounted) setUserRole(data?.role || null);
-      } else {
-        if (isMounted) setUserRole(null);
-      }
-      if (isMounted) setLoading(false);
+      setLocalLoading(false);
     }
 
+    setLocalLoading(true);
     getUserAndRole();
 
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -166,7 +157,9 @@ export default function SideNavbar() {
       isMounted = false;
       listener?.subscription.unsubscribe();
     };
-  }, [setLoading, setUserRole]);
+  }, []);
+
+  const [localLoading, setLocalLoading] = useState(false);
 
   const filteredNavSections = NAV_SECTIONS.map((section) => {
     if (section.category === "Admin" && userRole !== "admin") return { ...section, items: [] };
@@ -212,7 +205,7 @@ export default function SideNavbar() {
       <nav className="mt-4">
         <ul className="flex flex-col gap-2">
           <li key="login-or-account">
-            {loading ? (
+            {(localLoading || loading) ? (
               <div
                 className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-gray-700 dark:text-gray-200 transition ${
                   open ? "" : "justify-center"
