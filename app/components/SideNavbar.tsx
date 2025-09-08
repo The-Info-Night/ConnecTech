@@ -100,9 +100,18 @@ const NAV_SECTIONS: { category: string; items: NavItem[] }[] = [
             <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2z" />
           </svg>
         ),
-        href: "/public_pages/events",
+        href: "/public_pages/events"
       },
-    ],
+      {
+        name: "News",
+        icon: (
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+            <path d="M4 6h16M4 10h16M4 14h10M4 18h10" />
+          </svg>
+        ),
+        href: "/public_pages/news"
+      }
+    ]
   },
 ];
 
@@ -120,15 +129,36 @@ export default function SideNavbar() {
   const [open, setOpen] = useState(true);
   const [user, setUser] = useState<any>(null);
 
-  const { userRole, loading } = useUserRole();
+  const { userRole, loading, setUserRole, setLoading } = useUserRole();
 
   useEffect(() => {
     let isMounted = true;
-    async function fetchUser() {
-      const { data: { user }, error } = await supabase.auth.getUser();
-      if (!error && isMounted) setUser(user);
+
+    async function getUserAndRole() {
+      setLoading(true);
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError) { 
+        if (isMounted) { setUser(null); setUserRole(null); } 
+        setLoading(false); 
+        return; 
+      }
+      if (isMounted) setUser(user);
+
+      if (user?.id) {
+        const { data, error: roleError } = await supabase
+          .from("users")
+          .select("role")
+          .eq("email", user.email)
+          .maybeSingle();
+        if (!roleError && isMounted) setUserRole(data?.role || null);
+      } else {
+        if (isMounted) setUserRole(null);
+      }
+      if (isMounted) setLoading(false);
     }
-    fetchUser();
+
+    getUserAndRole();
+
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
     });
@@ -136,15 +166,11 @@ export default function SideNavbar() {
       isMounted = false;
       listener?.subscription.unsubscribe();
     };
-  }, []);
+  }, [setLoading, setUserRole]);
 
   const filteredNavSections = NAV_SECTIONS.map((section) => {
-    if (section.category === "Admin" && userRole !== "admin") {
-      return { ...section, items: [] };
-    }
-    if (section.category === "Startup" && userRole !== "founder") {
-      return { ...section, items: [] };
-    }
+    if (section.category === "Admin" && userRole !== "admin") return { ...section, items: [] };
+    if (section.category === "Startup" && userRole !== "founder") return { ...section, items: [] };
     return section;
   });
 
@@ -163,6 +189,7 @@ export default function SideNavbar() {
         open ? "w-56" : "w-16"
       }`}
     >
+      {/* Toggle button */}
       <div className="flex items-center justify-end px-4 py-4 border-b border-gray-200 dark:border-gray-800">
         <button
           className="ml-auto p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition"
@@ -186,22 +213,25 @@ export default function SideNavbar() {
         <ul className="flex flex-col gap-2">
           <li key="login-or-account">
             {loading ? (
-              <div className="flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-gray-700 dark:text-gray-200 transition justify-center">
-                <svg className="w-6 h-6 animate-spin-slow" viewBox="0 0 24 24" fill="none">
-                  <circle className="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path d="M22 12a10 10 0 0 1-10 10" stroke="url(#loading-gradient)" strokeWidth="4" strokeLinecap="round" fill="none" />
-                  <defs>
-                    <linearGradient id="loading-gradient" x1="12" y1="2" x2="12" y2="22" gradientUnits="userSpaceOnUse">
-                      <stop stopColor="#60a5fa" />
-                      <stop offset="1" stopColor="#a5b4fc" />
-                    </linearGradient>
-                  </defs>
-                </svg>
-                <span>Loading...</span>
+              <div
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-gray-700 dark:text-gray-200 transition ${
+                  open ? "" : "justify-center"
+                }`}
+              >
+                <span className="relative w-6 h-6 flex items-center justify-center">
+                  <svg className="w-6 h-6 animate-spin-slow" viewBox="0 0 24 24" fill="none">
+                    <circle className="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path d="M22 12a10 10 0 0 1-10 10" stroke="url(#loading-gradient)" strokeWidth="4" strokeLinecap="round" fill="none" />
+                  </svg>
+                </span>
               </div>
             ) : user ? (
               <div className={`flex items-center ${open ? "" : "justify-center"}`}>
-                <AccountDropdown userId={user.id} />
+                <AccountDropdown
+                  userId={user.id}
+                  sidebarOpen={open}
+                  onOpenSidebar={() => setOpen(true)}
+                />
               </div>
             ) : (
               <a
@@ -211,23 +241,11 @@ export default function SideNavbar() {
                 }`}
                 title="Login"
               >
-                <svg
-                  className="w-6 h-6"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                  viewBox="0 0 24 24"
-                >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
                   <circle cx="12" cy="8" r="4" />
                   <path d="M4 20c0-4 4-7 8-7s8 3 8 7" />
                 </svg>
-                <span
-                  className={`transition-all duration-200 ${
-                    open ? "opacity-100 ml-2" : "opacity-0 w-0 ml-0 pointer-events-none"
-                  }`}
-                >
-                  Login
-                </span>
+                {open && <span className="transition-all duration-200 ml-2">Login</span>}
               </a>
             )}
           </li>
@@ -242,13 +260,7 @@ export default function SideNavbar() {
                 title={item.name}
               >
                 {item.icon}
-                <span
-                  className={`transition-all duration-200 ${
-                    open ? "opacity-100 ml-2" : "opacity-0 w-0 ml-0 pointer-events-none"
-                  }`}
-                >
-                  {item.name}
-                </span>
+                {open && <span className="transition-all duration-200 ml-2">{item.name}</span>}
               </a>
             </li>
           ))}
