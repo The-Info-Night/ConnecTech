@@ -110,13 +110,11 @@ export default function ProjectsCatalog() {
   };
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-start px-2 py-8
-      bg-gradient-to-br from-[#E4BEF8] via-[#CB90F1] to-[#F18585]">
+    <div className="w-full max-w-5xl flex flex-col items-center justify-center px-2 py-8">
       <h2 className="text-3xl md:text-5xl font-extrabold text-center mb-10 text-[#7A3192] drop-shadow-lg">
         Startup catalog
       </h2>
 
-      {/* Filtres alignés et responsive, fond pastel et border contrastée */}
       <div className="w-full max-w-5xl grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-10">
         <input
           type="text"

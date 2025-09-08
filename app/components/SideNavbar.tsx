@@ -221,8 +221,8 @@ export default function SideNavbar() {
           ${open ? "translate-x-0" : "-translate-x-full"} w-56
           lg:translate-x-0 lg:${open ? "w-56" : "w-20"} lg:w-auto
         `}
-        style={
-          isDesktop
+        style={{
+          ...(isDesktop
             ? {
                 width: open ? "14rem" : "5rem",
                 minWidth: open ? "14rem" : "5rem",
@@ -230,8 +230,9 @@ export default function SideNavbar() {
                 transition: "all 0.3s",
                 transform: "translateX(0)",
               }
-            : undefined
-        }
+            : {}),
+          borderRight: "1px solid rgba(238, 213, 251, 0.56)", // Ajout d'un contour noir à droite, 50% opacity
+        }}
       >
         {/* Collapse button desktop */}
         <div className="hidden lg:flex items-center justify-end px-4 py-4 border-b border-[#EED5FB]/50">
