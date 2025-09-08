@@ -104,6 +104,15 @@ const NAV_SECTIONS: { category: string; items: NavItem[] }[] = [
           </svg>
         ),
         href: "/public_pages/events"
+      },
+      {
+        name: "News",
+        icon: (
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+            <path d="M4 6h16M4 10h16M4 14h10M4 18h10" />
+          </svg>
+        ),
+        href: "/public_pages/news"
       }
     ]
   },
