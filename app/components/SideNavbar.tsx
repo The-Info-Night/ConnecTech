@@ -89,7 +89,22 @@ const NAV_SECTIONS: { category: string; items: NavItem[] }[] = [
       {
         name: "Catalog",
         icon: (
-          <Image src="/catalog.svg" alt="Catalog Icon" width={24} height={24} />
+          <svg
+            className="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            viewBox="0 0 24 24"
+          >
+            <path d="M12 7v14" />
+            <path d="M16 12h2" />
+            <path d="M16 8h2" />
+            <path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z" />
+            <path d="M6 12h2" />
+            <path d="M6 8h2" />
+          </svg>
         ),
         href: "/public_pages/catalog",
       },
@@ -130,7 +145,6 @@ export default function SideNavbar() {
   const [user, setUser] = useState<any>(null);
   const { userRole, loading } = useUserRole();
   const [localLoading, setLocalLoading] = useState(false);
-
   const [isDesktop, setIsDesktop] = useState(false);
 
   useEffect(() => {
@@ -146,20 +160,16 @@ export default function SideNavbar() {
 
   useEffect(() => {
     let isMounted = true;
-
     async function getUserAndRole() {
       setLocalLoading(true);
       const { data: { user }, error } = await supabase.auth.getUser();
       if (!error && isMounted) setUser(user ?? null);
       setLocalLoading(false);
     }
-
     getUserAndRole();
-
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
     });
-
     return () => {
       isMounted = false;
       listener?.subscription.unsubscribe();
@@ -173,18 +183,16 @@ export default function SideNavbar() {
   });
 
   let navItems: NavItem[] = filteredNavSections.flatMap((section) => section.items);
-
   if (userRole === "investor") {
     const alreadyPresent = navItems.some((item) => item.href === INVESTOR_MESSAGES_ITEM.href);
     if (!alreadyPresent) navItems = [INVESTOR_MESSAGES_ITEM, ...navItems];
   }
 
-  const desktopSidebarOpen = isDesktop ? open : undefined;
-
   return (
     <>
+      {/* Burger mobile */}
       <button
-        className="lg:hidden fixed top-4 left-4 z-30 p-2 rounded-md bg-gray-100 dark:bg-gray-800"
+        className="lg:hidden fixed top-4 left-4 z-30 p-2 rounded-md bg-white/90 text-[#F18585] shadow"
         onClick={() => setOpen((v) => !v)}
         aria-label="Toggle menu"
       >
@@ -196,19 +204,23 @@ export default function SideNavbar() {
           )}
         </svg>
       </button>
-
+      {/* Overlay mobile */}
       {open && (
         <div
-          className="fixed inset-0 bg-black/40 z-10 lg:hidden"
+          className="fixed inset-0 bg-[#eed5fb]/70 z-10 lg:hidden"
           onClick={() => setOpen(false)}
         />
       )}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-20 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800
+        className={`
+          fixed inset-y-0 left-0 z-20 
+          bg-gradient-to-b from-[#F18585] via-[#CB90F1] to-[#EED5FB]
+          border-r border-[#CB90F1]/25 shadow-lg
           transition-all duration-300
           ${open ? "translate-x-0" : "-translate-x-full"} w-56
-          lg:translate-x-0 lg:${open ? "w-56" : "w-20"} lg:w-auto`}
+          lg:translate-x-0 lg:${open ? "w-56" : "w-20"} lg:w-auto
+        `}
         style={
           isDesktop
             ? {
@@ -221,16 +233,17 @@ export default function SideNavbar() {
             : undefined
         }
       >
-        <div className="hidden lg:flex items-center justify-end px-4 py-4 border-b border-gray-200 dark:border-gray-800">
+        {/* Collapse button desktop */}
+        <div className="hidden lg:flex items-center justify-end px-4 py-4 border-b border-[#EED5FB]/50">
           <button
-            className="ml-auto p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+            className="ml-auto p-1 rounded hover:bg-[#EED5FB]/60"
             onClick={() => setOpen((v) => !v)}
             aria-label={open ? "Hide sidebar" : "Show sidebar"}
           >
             <svg
               className={`w-6 h-6 transition-transform ${open ? "" : "rotate-180"}`}
               fill="none"
-              stroke="currentColor"
+              stroke="#CB90F1"
               strokeWidth={2}
               viewBox="0 0 24 24"
             >
@@ -240,55 +253,55 @@ export default function SideNavbar() {
           </button>
         </div>
 
-        <nav className="mt-4">
+        <nav className="pt-6">
           <ul className="flex flex-col gap-2">
-            <div style={{ height: "32px" }} />
+
+            {/* Compte ou login */}
             <li key="login-or-account">
               {(localLoading || loading) ? (
-                <div
-                  className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-gray-700 dark:text-gray-200 transition ${
-                    open ? "" : "justify-center"
-                  }`}
-                >
-                  <span className="relative w-6 h-6 flex items-center justify-center">
-                    <svg className="w-6 h-6 animate-spin-slow" viewBox="0 0 24 24" fill="none">
-                      <circle className="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                      <path d="M22 12a10 10 0 0 1-10 10" stroke="url(#loading-gradient)" strokeWidth="4" strokeLinecap="round" fill="none" />
-                    </svg>
-                  </span>
+                <div className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-[#F49C9C] transition ${open ? "" : "justify-center"}`}>
+                  <svg className="w-6 h-6 animate-spin" fill="none" stroke="#F49C9C" strokeWidth={2} viewBox="0 0 24 24">
+                    <circle className="opacity-20" cx="12" cy="12" r="10" stroke="#F49C9C" strokeWidth="4" />
+                  </svg>
+                  {open && <span className="ml-2">Chargement...</span>}
                 </div>
               ) : user ? (
-                <div className={`flex items-center ${open ? "" : "justify-center"}`}>
+                <div className={`flex items-center ${open ? "pl-2" : "justify-center"}`}>
                   <AccountDropdown userId={user.id} sidebarOpen={open} onOpenSidebar={() => setOpen(true)} />
                 </div>
               ) : (
                 <a
                   href="/public_pages/login"
-                  className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition ${
-                    open ? "" : "justify-center"
-                  }`}
+                  className={`
+                    flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-[#F18585] 
+                    hover:bg-[#EED5FB] hover:text-[#7A3192]
+                    transition ${open ? "justify-start" : "justify-center"}
+                  `}
                   title="Login"
                 >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                  <svg className="w-6 h-6" fill="none" stroke="#F18585" strokeWidth={2} viewBox="0 0 24 24">
                     <circle cx="12" cy="8" r="4" />
                     <path d="M4 20c0-4 4-7 8-7s8 3 8 7" />
                   </svg>
-                  {open && <span className="transition-all duration-200 ml-2">Login</span>}
+                  {open && <span className="ml-2">Login</span>}
                 </a>
               )}
             </li>
-
+            {/* Liens */}
             {navItems.map((item) => (
               <li key={item.name}>
                 <a
                   href={item.href}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition ${
-                    open ? "" : "justify-center"
-                  }`}
+                  className={`
+                    flex items-center gap-3 px-4 py-3 rounded-lg font-bold 
+                    text-[#7A3192] hover:bg-white/80 hover:text-[#F18585]
+                    active:bg-[#E4BEF8] active:text-[#C174F2] transition
+                    shadow-sm ${open ? "justify-start" : "justify-center"}
+                  `}
                   title={item.name}
                 >
                   {item.icon}
-                  {open && <span className="transition-all duration-200 ml-2">{item.name}</span>}
+                  {open && <span className="ml-2">{item.name}</span>}
                 </a>
               </li>
             ))}
