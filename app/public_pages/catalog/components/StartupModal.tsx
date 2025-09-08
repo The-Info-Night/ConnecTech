@@ -72,28 +72,28 @@ export default function StartupModal({ startup, isOpen, onClose }: StartupModalP
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {startup.sector && (
               <div>
-                <h4 className="font-medium text-gray-900 dark:text-white">Secteur</h4>
+                <h4 className="font-medium text-gray-900 dark:text-white">Sector</h4>
                 <p className="text-gray-600 dark:text-gray-400">{startup.sector}</p>
               </div>
             )}
 
             {startup.project_status && (
               <div>
-                <h4 className="font-medium text-gray-900 dark:text-white">Statut</h4>
+                <h4 className="font-medium text-gray-900 dark:text-white">Status</h4>
                 <p className="text-gray-600 dark:text-gray-400">{startup.project_status}</p>
               </div>
             )}
 
             {startup.maturity && (
               <div>
-                <h4 className="font-medium text-gray-900 dark:text-white">Maturité</h4>
+                <h4 className="font-medium text-gray-900 dark:text-white">Maturity</h4>
                 <p className="text-gray-600 dark:text-gray-400">{startup.maturity}</p>
               </div>
             )}
 
             {startup.legal_status && (
               <div>
-                <h4 className="font-medium text-gray-900 dark:text-white">Statut légal</h4>
+                <h4 className="font-medium text-gray-900 dark:text-white">Legal status</h4>
                 <p className="text-gray-600 dark:text-gray-400">{startup.legal_status}</p>
               </div>
             )}
@@ -112,12 +112,12 @@ export default function StartupModal({ startup, isOpen, onClose }: StartupModalP
                 )}
                 {startup.phone && (
                   <p className="text-gray-600 dark:text-gray-400">
-                    <span className="font-medium">Téléphone:</span> {startup.phone}
+                    <span className="font-medium">Phone:</span> {startup.phone}
                   </p>
                 )}
                 {startup.address && (
                   <p className="text-gray-600 dark:text-gray-400">
-                    <span className="font-medium">Adresse:</span> {startup.address}
+                    <span className="font-medium">Address:</span> {startup.address}
                   </p>
                 )}
               </div>
@@ -127,7 +127,7 @@ export default function StartupModal({ startup, isOpen, onClose }: StartupModalP
           {startup.needs && (
             <div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                Besoins
+                Needs
               </h3>
               <p className="text-gray-600 dark:text-gray-400">{startup.needs}</p>
             </div>
@@ -136,7 +136,7 @@ export default function StartupModal({ startup, isOpen, onClose }: StartupModalP
           {startup.founders && startup.founders.length > 0 && (
             <div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                Fondateurs
+                Founders
               </h3>
               <ul className="list-disc list-inside text-gray-600 dark:text-gray-400">
                 {startup.founders.map((founder, index) => (
@@ -149,7 +149,7 @@ export default function StartupModal({ startup, isOpen, onClose }: StartupModalP
           {(startup.website_url || startup.social_media_url) && (
             <div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                Liens
+                Links
               </h3>
               <div className="space-y-2">
                 {startup.website_url && (
@@ -159,7 +159,7 @@ export default function StartupModal({ startup, isOpen, onClose }: StartupModalP
                     rel="noopener noreferrer"
                     className="block text-blue-600 dark:text-blue-400 hover:underline"
                   >
-                    Site web
+                    Website
                   </a>
                 )}
                 {startup.social_media_url && (
@@ -169,7 +169,7 @@ export default function StartupModal({ startup, isOpen, onClose }: StartupModalP
                     rel="noopener noreferrer"
                     className="block text-blue-600 dark:text-blue-400 hover:underline"
                   >
-                    Réseaux sociaux
+                    Social media
                   </a>
                 )}
               </div>

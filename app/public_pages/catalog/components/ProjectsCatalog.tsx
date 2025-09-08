@@ -1,7 +1,8 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+
+import { useEffect, useState } from "react";
 import ProjectCard from "./ProjectCard";
-import { getRows, getStartups, searchStartups, getDistinctValues, getFilteredStartups, getRowById } from "@/lib/supabaseServices";
+import { getRows, getFilteredStartups, getDistinctValues, getRowById } from "@/lib/supabaseServices";
 import StartupModal from "./StartupModal";
 
 type Startup = {
@@ -26,8 +27,8 @@ export default function ProjectsCatalog() {
   const [startups, setStartups] = useState<Startup[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [sector, setSector] = useState<string>("");
-  const [status, setStatus] = useState<string>("");
+  const [sector, setSector] = useState("");
+  const [status, setStatus] = useState("");
   const [sectors, setSectors] = useState<string[]>([]);
   const [statuses, setStatuses] = useState<string[]>([]);
   const [selectedStartup, setSelectedStartup] = useState<Startup | null>(null);
@@ -37,15 +38,16 @@ export default function ProjectsCatalog() {
 
   useEffect(() => {
     let isCancelled = false;
-
     async function fetchStartups() {
       setLoading(true);
       setError(null);
-
       try {
-        const hasFilters = (sector && sector !== "") || (status && status !== "");
-        if (debouncedQuery.trim().length === 0 && !hasFilters) {
-          const data = await getRows<Startup>("startups", "id,name,description,sector,project_status,website_url,legal_status,address,email,phone,social_media_url,maturity,needs,founders");
+        const hasFilters = sector !== "" || status !== "";
+        if (debouncedQuery.trim() === "" && !hasFilters) {
+          const data = await getRows<Startup>(
+            "startups",
+            "id,name,description,sector,project_status,website_url,legal_status,address,email,phone,social_media_url,maturity,needs,founders"
+          );
           if (!isCancelled) setStartups(data);
         } else {
           const data = await getFilteredStartups({
@@ -56,16 +58,14 @@ export default function ProjectsCatalog() {
           });
           if (!isCancelled) setStartups(data);
         }
-      } catch (e: unknown) {
-        const anyErr = e as { message?: string } | null;
-        const message = anyErr?.message ?? "Unknown error";
-        console.error("Startup fetch/search error:", e);
-        if (!isCancelled) setError(message);
+      } catch (e: any) {
+        if (!isCancelled) {
+          setError(e.message || "Unexpected error");
+        }
       } finally {
         if (!isCancelled) setLoading(false);
       }
     }
-
     fetchStartups();
     return () => {
       isCancelled = true;
@@ -84,7 +84,8 @@ export default function ProjectsCatalog() {
           setSectors(sectorsData);
           setStatuses(statusesData);
         }
-      } catch (e) {
+      } catch {
+        // Ignore errors here silently
       }
     }
     loadOptions();
@@ -95,7 +96,11 @@ export default function ProjectsCatalog() {
 
   const handleCardClick = async (startupId: number) => {
     try {
-      const fullStartup = await getRowById<Startup>("startups", startupId, "id,name,description,sector,needs,project_status,website_url,legal_status,address,email,phone,social_media_url,maturity,founders");
+      const fullStartup = await getRowById<Startup>(
+        "startups",
+        startupId,
+        "id,name,description,sector,needs,project_status,website_url,legal_status,address,email,phone,social_media_url,maturity,founders"
+      );
       if (fullStartup) {
         setSelectedStartup(fullStartup);
         setIsModalOpen(true);
@@ -106,36 +111,43 @@ export default function ProjectsCatalog() {
   };
 
   return (
-    <div className="container mx-auto py-10 w-full">
-      <h2 className="text-2xl md:text-4xl font-extrabold text-center mb-6 text-gray-900 dark:text-gray-100">
-        Catalog des Startups
+    <div className="w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <h2 className="text-2xl md:text-4xl font-extrabold text-center mb-8 text-gray-900 dark:text-gray-100">
+        Startup catalog
       </h2>
 
-      <div className="w-full max-w-4xl mx-auto px-4 mb-8 grid grid-cols-1 md:grid-cols-4 gap-3">
+      {/* Filtres alignés et responsive */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         <input
+          type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Rechercher une startup par nom ou description..."
-          className="md:col-span-2 w-full rounded-lg bg-white/90 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 px-4 py-3 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Search for a startup by name or description..."
+          className="col-span-1 sm:col-span-2 md:col-span-2 w-full px-4 py-3 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         <select
           value={sector}
           onChange={(e) => setSector(e.target.value)}
-          className="w-full rounded-lg bg-white/90 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 px-4 py-3 text-gray-900 dark:text-gray-100 focus:outline-none"
+          className="w-full px-4 py-3 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
-          <option value="">Secteur (tous)</option>
+          <option value="">Sector (all)</option>
           {sectors.map((s) => (
-            <option key={s} value={s}>{s}</option>
+            <option key={s} value={s}>
+              {s}
+            </option>
           ))}
         </select>
+
         <select
           value={status}
           onChange={(e) => setStatus(e.target.value)}
-          className="w-full rounded-lg bg-white/90 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 px-4 py-3 text-gray-900 dark:text-gray-100 focus:outline-none"
+          className="w-full px-4 py-3 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
-          <option value="">Statut (tous)</option>
+          <option value="">Status (all)</option>
           {statuses.map((s) => (
-            <option key={s} value={s}>{s}</option>
+            <option key={s} value={s}>
+              {s}
+            </option>
           ))}
         </select>
       </div>
@@ -145,11 +157,11 @@ export default function ProjectsCatalog() {
       )}
 
       {loading ? (
-        <p className="text-center text-gray-400">Chargement...</p>
+        <p className="text-center text-gray-500 dark:text-gray-400">Loading...</p>
       ) : startups.length === 0 ? (
-        <p className="text-center text-gray-400">Aucun résultat</p>
+        <p className="text-center text-gray-500 dark:text-gray-400">No results</p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 px-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {startups.map((startup) => (
             <ProjectCard
               key={startup.id}
@@ -174,11 +186,12 @@ export default function ProjectsCatalog() {
   );
 }
 
+// Debounce helper
 function useDebouncedValue(value: string, delayMs: number) {
   const [debounced, setDebounced] = useState(value);
   useEffect(() => {
-    const id = setTimeout(() => setDebounced(value), delayMs);
-    return () => clearTimeout(id);
+    const timeout = setTimeout(() => setDebounced(value), delayMs);
+    return () => clearTimeout(timeout);
   }, [value, delayMs]);
   return debounced;
 }
