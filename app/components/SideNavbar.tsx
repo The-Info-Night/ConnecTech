@@ -126,35 +126,32 @@ const INVESTOR_MESSAGES_ITEM: NavItem = {
 };
 
 export default function SideNavbar() {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const { userRole, loading } = useUserRole();
+  const [localLoading, setLocalLoading] = useState(false);
 
-  const { userRole, loading, setUserRole, setLoading } = useUserRole();
+  const [isDesktop, setIsDesktop] = useState(false);
+
+  useEffect(() => {
+    function checkDesktop() {
+      if (typeof window !== "undefined") {
+        setIsDesktop(window.innerWidth >= 1024);
+      }
+    }
+    checkDesktop();
+    window.addEventListener("resize", checkDesktop);
+    return () => window.removeEventListener("resize", checkDesktop);
+  }, []);
 
   useEffect(() => {
     let isMounted = true;
 
     async function getUserAndRole() {
-      setLoading(true);
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
-      if (userError) { 
-        if (isMounted) { setUser(null); setUserRole(null); } 
-        setLoading(false); 
-        return; 
-      }
-      if (isMounted) setUser(user);
-
-      if (user?.id) {
-        const { data, error: roleError } = await supabase
-          .from("users")
-          .select("role")
-          .eq("email", user.email)
-          .maybeSingle();
-        if (!roleError && isMounted) setUserRole(data?.role || null);
-      } else {
-        if (isMounted) setUserRole(null);
-      }
-      if (isMounted) setLoading(false);
+      setLocalLoading(true);
+      const { data: { user }, error } = await supabase.auth.getUser();
+      if (!error && isMounted) setUser(user ?? null);
+      setLocalLoading(false);
     }
 
     getUserAndRole();
@@ -162,11 +159,12 @@ export default function SideNavbar() {
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
     });
+
     return () => {
       isMounted = false;
       listener?.subscription.unsubscribe();
     };
-  }, [setLoading, setUserRole]);
+  }, []);
 
   const filteredNavSections = NAV_SECTIONS.map((section) => {
     if (section.category === "Admin" && userRole !== "admin") return { ...section, items: [] };
@@ -177,95 +175,126 @@ export default function SideNavbar() {
   let navItems: NavItem[] = filteredNavSections.flatMap((section) => section.items);
 
   if (userRole === "investor") {
-    const alreadyPresent = navItems.some(item => item.href === INVESTOR_MESSAGES_ITEM.href);
-    if (!alreadyPresent) {
-      navItems = [INVESTOR_MESSAGES_ITEM, ...navItems];
-    }
+    const alreadyPresent = navItems.some((item) => item.href === INVESTOR_MESSAGES_ITEM.href);
+    if (!alreadyPresent) navItems = [INVESTOR_MESSAGES_ITEM, ...navItems];
   }
 
+  const desktopSidebarOpen = isDesktop ? open : undefined;
+
   return (
-    <aside
-      className={`fixed inset-y-0 left-0 z-20 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 transition-all duration-300 ${
-        open ? "w-56" : "w-16"
-      }`}
-    >
-      {/* Toggle button */}
-      <div className="flex items-center justify-end px-4 py-4 border-b border-gray-200 dark:border-gray-800">
-        <button
-          className="ml-auto p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition"
-          onClick={() => setOpen((v) => !v)}
-          aria-label={open ? "Hide sidebar" : "Show sidebar"}
-        >
-          <svg
-            className={`w-6 h-6 transition-transform ${open ? "" : "rotate-180"}`}
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={2}
-            viewBox="0 0 24 24"
+    <>
+      <button
+        className="lg:hidden fixed top-4 left-4 z-30 p-2 rounded-md bg-gray-100 dark:bg-gray-800"
+        onClick={() => setOpen((v) => !v)}
+        aria-label="Toggle menu"
+      >
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+          {open ? (
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+          ) : (
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+          )}
+        </svg>
+      </button>
+
+      {open && (
+        <div
+          className="fixed inset-0 bg-black/40 z-10 lg:hidden"
+          onClick={() => setOpen(false)}
+        />
+      )}
+
+      <aside
+        className={`fixed inset-y-0 left-0 z-20 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800
+          transition-all duration-300
+          ${open ? "translate-x-0" : "-translate-x-full"} w-56
+          lg:translate-x-0 lg:${open ? "w-56" : "w-20"} lg:w-auto`}
+        style={
+          isDesktop
+            ? {
+                width: open ? "14rem" : "5rem",
+                minWidth: open ? "14rem" : "5rem",
+                maxWidth: open ? "14rem" : "5rem",
+                transition: "all 0.3s",
+                transform: "translateX(0)",
+              }
+            : undefined
+        }
+      >
+        <div className="hidden lg:flex items-center justify-end px-4 py-4 border-b border-gray-200 dark:border-gray-800">
+          <button
+            className="ml-auto p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+            onClick={() => setOpen((v) => !v)}
+            aria-label={open ? "Hide sidebar" : "Show sidebar"}
           >
-            <path d="M19 12H5" />
-            <path d="M12 5l-7 7 7 7" />
-          </svg>
-        </button>
-      </div>
+            <svg
+              className={`w-6 h-6 transition-transform ${open ? "" : "rotate-180"}`}
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+              viewBox="0 0 24 24"
+            >
+              <path d="M19 12H5" />
+              <path d="M12 5l-7 7 7 7" />
+            </svg>
+          </button>
+        </div>
 
-      <nav className="mt-4">
-        <ul className="flex flex-col gap-2">
-          <li key="login-or-account">
-            {loading ? (
-              <div
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-gray-700 dark:text-gray-200 transition ${
-                  open ? "" : "justify-center"
-                }`}
-              >
-                <span className="relative w-6 h-6 flex items-center justify-center">
-                  <svg className="w-6 h-6 animate-spin-slow" viewBox="0 0 24 24" fill="none">
-                    <circle className="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path d="M22 12a10 10 0 0 1-10 10" stroke="url(#loading-gradient)" strokeWidth="4" strokeLinecap="round" fill="none" />
+        <nav className="mt-4">
+          <ul className="flex flex-col gap-2">
+            <div style={{ height: "32px" }} />
+            <li key="login-or-account">
+              {(localLoading || loading) ? (
+                <div
+                  className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-gray-700 dark:text-gray-200 transition ${
+                    open ? "" : "justify-center"
+                  }`}
+                >
+                  <span className="relative w-6 h-6 flex items-center justify-center">
+                    <svg className="w-6 h-6 animate-spin-slow" viewBox="0 0 24 24" fill="none">
+                      <circle className="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path d="M22 12a10 10 0 0 1-10 10" stroke="url(#loading-gradient)" strokeWidth="4" strokeLinecap="round" fill="none" />
+                    </svg>
+                  </span>
+                </div>
+              ) : user ? (
+                <div className={`flex items-center ${open ? "" : "justify-center"}`}>
+                  <AccountDropdown userId={user.id} sidebarOpen={open} onOpenSidebar={() => setOpen(true)} />
+                </div>
+              ) : (
+                <a
+                  href="/public_pages/login"
+                  className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition ${
+                    open ? "" : "justify-center"
+                  }`}
+                  title="Login"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                    <circle cx="12" cy="8" r="4" />
+                    <path d="M4 20c0-4 4-7 8-7s8 3 8 7" />
                   </svg>
-                </span>
-              </div>
-            ) : user ? (
-              <div className={`flex items-center ${open ? "" : "justify-center"}`}>
-                <AccountDropdown
-                  userId={user.id}
-                  sidebarOpen={open}
-                  onOpenSidebar={() => setOpen(true)}
-                />
-              </div>
-            ) : (
-              <a
-                href="/public_pages/login"
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition ${
-                  open ? "" : "justify-center"
-                }`}
-                title="Login"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                  <circle cx="12" cy="8" r="4" />
-                  <path d="M4 20c0-4 4-7 8-7s8 3 8 7" />
-                </svg>
-                {open && <span className="transition-all duration-200 ml-2">Login</span>}
-              </a>
-            )}
-          </li>
-
-          {navItems.map((item) => (
-            <li key={item.name}>
-              <a
-                href={item.href}
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition ${
-                  open ? "" : "justify-center"
-                }`}
-                title={item.name}
-              >
-                {item.icon}
-                {open && <span className="transition-all duration-200 ml-2">{item.name}</span>}
-              </a>
+                  {open && <span className="transition-all duration-200 ml-2">Login</span>}
+                </a>
+              )}
             </li>
-          ))}
-        </ul>
-      </nav>
-    </aside>
+
+            {navItems.map((item) => (
+              <li key={item.name}>
+                <a
+                  href={item.href}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition ${
+                    open ? "" : "justify-center"
+                  }`}
+                  title={item.name}
+                >
+                  {item.icon}
+                  {open && <span className="transition-all duration-200 ml-2">{item.name}</span>}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </aside>
+    </>
   );
 }
