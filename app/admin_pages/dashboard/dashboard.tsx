@@ -56,16 +56,15 @@ export default function DashboardPage({ sidebarOpen = false }: { sidebarOpen?: b
       .finally(() => setLoading(false));
   }, []);
 
-  // Palette pastel [image:1]
   const PALETTE = [
-    "#F18585", // rouge pastel
-    "#F49C9C", // rose pâle
-    "#CB90F1", // violet pastel
-    "#F8CACF", // rose clair
-    "#D5A8F2", // lavande pastel
-    "#E4BEF8", // violet très clair
-    "#C174F2", // violet "accent"
-    "#F6AEAE", // pêche
+    "#F18585",
+    "#F49C9C",
+    "#CB90F1",
+    "#F8CACF",
+    "#D5A8F2",
+    "#E4BEF8",
+    "#C174F2",
+    "#F6AEAE",
   ];
 
   const COLORS = PALETTE;

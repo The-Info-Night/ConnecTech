@@ -1,4 +1,3 @@
-"use client";
 import React, { useState } from 'react';
 import { supabase } from '../../../supabaseClient';
 import { useRouter } from "next/navigation";
@@ -80,7 +79,7 @@ const Login: React.FC<{ switchToSignup: () => void }> = ({ switchToSignup }) => 
   return (
     <>
       <form onSubmit={handleLogin} className="space-y-4">
-        <h2 className="text-2xl font-bold mb-6 text-center text-blue-900 dark:text-blue-400">Login to Connectech</h2>
+        <h2 className="text-2xl font-extrabold mb-6 text-center text-[#CB90F1]">Login to Connectech</h2>
         <input
           type="email"
           placeholder="Email"
@@ -88,7 +87,7 @@ const Login: React.FC<{ switchToSignup: () => void }> = ({ switchToSignup }) => 
           onChange={e => setEmail(e.target.value)}
           required
           disabled={loading}
-          className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
+          className="w-full px-4 py-2 border border-[#EED5FB] bg-[#EED5FB] text-[#7A3192] rounded-md focus:outline-none focus:ring-2 focus:ring-[#CB90F1] font-medium"
         />
         <input
           type="password"
@@ -97,45 +96,48 @@ const Login: React.FC<{ switchToSignup: () => void }> = ({ switchToSignup }) => 
           onChange={e => setPassword(e.target.value)}
           required
           disabled={loading}
-          className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
+          className="w-full px-4 py-2 border border-[#EED5FB] bg-[#EED5FB] text-[#7A3192] rounded-md focus:outline-none focus:ring-2 focus:ring-[#CB90F1] font-medium"
         />
         <button
           type="submit"
           disabled={loading}
-          className={`w-full py-2 rounded-md font-bold transition ${
-            loading ? 'bg-gray-400 text-gray-100' : 'bg-blue-600 hover:bg-blue-700 text-white'
-          }`}
+          className={`w-full py-2 rounded-md font-bold transition
+            ${loading
+              ? 'bg-[#EED5FB] text-[#CB90F1] opacity-50'
+              : 'bg-[#CB90F1] hover:bg-[#F18585] text-white shadow-lg'}
+          `}
         >
           {loading ? 'Logging in...' : 'Login'}
         </button>
       </form>
 
       <div className="flex items-center my-4">
-        <div className="flex-grow border-t border-gray-300 dark:border-gray-700"></div>
-        <span className="mx-2 text-gray-400 text-xs">or</span>
-        <div className="flex-grow border-t border-gray-300 dark:border-gray-700"></div>
+        <div className="flex-grow border-t border-[#EED5FB]"></div>
+        <span className="mx-2 text-[#CB90F1] text-xs">or</span>
+        <div className="flex-grow border-t border-[#EED5FB]"></div>
       </div>
 
       <button
         type="button"
         onClick={handleGithubLogin}
         disabled={loading}
-        className="w-full flex items-center justify-center gap-2 py-2 rounded-md font-bold transition bg-black hover:bg-gray-900 text-white border border-black mt-4"
+        className="w-full flex items-center justify-center gap-2 py-2 rounded-md font-bold transition
+          bg-[#EED5FB] border border-[#CB90F1] text-[#7A3192] hover:bg-[#F18585] hover:text-white shadow-sm mt-4"
         style={{ fontFamily: "'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', monospace" }}
       >
         {GITHUB_LOGO}
         <span style={{ fontFamily: "inherit", fontWeight: 600, letterSpacing: 0.5 }}>GitHub</span>
       </button>
 
-      {error && <span className="block mt-2 text-red-600 text-sm">{error}</span>}
+      {error && <span className="block mt-2 text-[#F18585] text-sm">{error}</span>}
       {success && <span className="block mt-2 text-green-500 text-sm">{success}</span>}
 
-      <div className="mt-4 text-center">
+      <div className="mt-4 text-center text-[#ca93ed]">
         <span>
           No account?{' '}
           <button
             type="button"
-            className="text-blue-600 hover:underline font-medium"
+            className="text-[#CB90F1] hover:text-[#F18585] font-bold underline transition"
             onClick={switchToSignup}
             disabled={loading}
           >
