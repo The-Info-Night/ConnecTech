@@ -35,15 +35,15 @@ export default function ProfileEditor() {
       }
       const { data, error } = await supabase
         .from("users")
-        .select("id, email, name, image_url")
-        .eq("email", user.email)
+        .select("uuid, email, name, image_url")
+        .eq("uuid", user.id)
         .maybeSingle();
 
       if (error) {
         setError(error.message);
       } else if (data) {
         setProfile({
-          uuid: data.id,
+          uuid: data.uuid,
           email: data.email,
           name: data.name,
           image_url: data.image_url,
@@ -87,7 +87,7 @@ export default function ProfileEditor() {
       const { error: updateError } = await supabase
         .from('users')
         .update({ image_url: data.publicUrl })
-        .eq('id', profile.uuid);
+        .eq('uuid', profile.uuid);
       if (updateError) throw updateError;
   
       // Optionally update user metadata (auth)
@@ -114,12 +114,12 @@ export default function ProfileEditor() {
     setError(null);
 
     const updates = {
-      id: profile.uuid,
+      uuid: profile.uuid,
       name,
       image_url: imageUrl,
       updated_at: new Date().toISOString(),
     };
-    const { error: updateError } = await supabase.from("users").upsert(updates);
+    const { error: updateError } = await supabase.from("users").upsert(updates, {onConflict: "uuid"});
     if (updateError) {
       setError(updateError.message);
     } else {
