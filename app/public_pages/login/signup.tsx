@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { supabase } from '../../../supabaseClient';
 
+
 const GITHUB_LOGO = (
   <svg
     aria-hidden="true"
@@ -21,13 +22,15 @@ const GITHUB_LOGO = (
   </svg>
 );
 
+
 const Signup: React.FC<{ switchToLogin: () => void }> = ({ switchToLogin }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [pseudo, setPseudo] = useState('');
+  const [username, setUsername] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState<string | null>(null);
+
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,12 +38,13 @@ const Signup: React.FC<{ switchToLogin: () => void }> = ({ switchToLogin }) => {
     setError(null);
     setSuccess(null);
 
+
     try {
       const { data, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          data: { pseudo }
+          data: { username }
         }
       });
       if (signUpError) {
@@ -55,6 +59,7 @@ const Signup: React.FC<{ switchToLogin: () => void }> = ({ switchToLogin }) => {
     setLoading(false);
   };
 
+
   const handleGithubLogin = async () => {
     setLoading(true);
     setError(null);
@@ -68,15 +73,16 @@ const Signup: React.FC<{ switchToLogin: () => void }> = ({ switchToLogin }) => {
     setLoading(false);
   };
 
+
   return (
     <>
       <form onSubmit={handleSignup} className="space-y-4">
         <h2 className="text-2xl font-extrabold mb-6 text-center text-[#CB90F1]">Create an account</h2>
         <input
           type="text"
-          placeholder="Pseudo"
-          value={pseudo}
-          onChange={e => setPseudo(e.target.value)}
+          placeholder="Username"
+          value={username}
+          onChange={e => setUsername(e.target.value)}
           required
           disabled={loading}
           className="w-full px-4 py-2 border border-[#EED5FB] bg-[#EED5FB] text-[#7A3192] rounded-md focus:outline-none focus:ring-2 focus:ring-[#CB90F1] font-medium"
@@ -112,11 +118,13 @@ const Signup: React.FC<{ switchToLogin: () => void }> = ({ switchToLogin }) => {
         </button>
       </form>
 
+
       <div className="flex items-center my-4">
         <div className="flex-grow border-t border-[#EED5FB]"></div>
         <span className="mx-2 text-[#CB90F1] text-xs">or</span>
         <div className="flex-grow border-t border-[#EED5FB]"></div>
       </div>
+
 
       <button
         type="button"
@@ -130,8 +138,10 @@ const Signup: React.FC<{ switchToLogin: () => void }> = ({ switchToLogin }) => {
         <span style={{ fontFamily: "inherit", fontWeight: 600, letterSpacing: 0.5 }}>GitHub</span>
       </button>
 
+
       {error && <span className="block mt-2 text-[#F18585] text-sm">{error}</span>}
       {success && <span className="block mt-2 text-green-500 text-sm">{success}</span>}
+
 
       <div className="mt-4 text-center text-[#ca93ed]">
         <span>
@@ -149,5 +159,6 @@ const Signup: React.FC<{ switchToLogin: () => void }> = ({ switchToLogin }) => {
     </>
   );
 };
+
 
 export default Signup;
