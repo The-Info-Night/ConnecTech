@@ -280,15 +280,15 @@ export default function PitchDeckPage({ sidebarOpen = false }: { sidebarOpen?: b
           </section>
 
           {/* Export button */}
-          <div className="group mt-8 max-w-6xl mx-auto px-4 sm:px-0">
-            <button
-              onClick={handleExport}
+          <div className="group mt-8 max-w-6xl mx-auto px-4 sm:px-0 text-center">
+            <Link
+              href="/pitch-deck-1.pdf"
+              download
               className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-white dark:bg-gray-800 text-black dark:text-white font-bold shadow hover:bg-gray-100 dark:hover:bg-gray-700 transition"
-              disabled={loadingExport}
             >
               <Download className="w-5 h-5" />
-              {loadingExport ? "Exporting..." : "Extract as PDF"}
-            </button>
+              Download Pitch Deck
+            </Link>
           </div>
 
         </div>
