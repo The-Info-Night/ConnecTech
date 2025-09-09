@@ -231,7 +231,7 @@ export default function SideNavbar() {
                 transform: "translateX(0)",
               }
             : {}),
-          borderRight: "1px solid rgba(238, 213, 251, 0.56)", // Ajout d'un contour noir à droite, 50% opacity
+          borderRight: "1px solid rgba(238, 213, 251, 0.56)",
         }}
       >
         {/* Collapse button desktop */}
@@ -257,7 +257,7 @@ export default function SideNavbar() {
         <nav className="pt-6">
           <ul className="flex flex-col gap-2">
 
-            {/* Compte ou login */}
+            {/* Login or account */}
             <li key="login-or-account">
               {(localLoading || loading) ? (
                 <div className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-[#F49C9C] transition ${open ? "" : "justify-center"}`}>
@@ -290,7 +290,7 @@ export default function SideNavbar() {
                 </a>
               )}
             </li>
-            {/* Liens */}
+            {/* Links */}
             {navItems.map((item) => (
               <li key={item.name}>
                 <a
