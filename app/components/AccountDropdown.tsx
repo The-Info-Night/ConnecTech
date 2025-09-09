@@ -43,7 +43,7 @@ export default function AccountDropdown({
           boxShadow: "0 1px 4px 0 #cb90f122",
         }}
       >
-        <svg className="w-6 h-6" fill="none" stroke="#CB90F1" strokeWidth={2} viewBox="0 0 24 24">
+        <svg className="w-6 h-6" fill="none" stroke="#7A3192" strokeWidth={2} viewBox="0 0 24 24">
           <circle cx="12" cy="8" r="4" />
           <path d="M4 20c0-4 4-7 8-7s8 3 8 7" />
         </svg>
@@ -51,11 +51,9 @@ export default function AccountDropdown({
           <span className="transition-all duration-200 ml-2">Account</span>
         )}
         <svg
-          className={`w-4 h-4 text-[#CB90F1] transition-transform ${
-            open ? "rotate-180" : ""
-          }`}
+          className={`w-4 h-4 text-[#7A3192] transition-transform ${open ? "rotate-180" : ""}`}
           fill="none"
-          stroke="#CB90F1"
+          stroke="#7A3192"
           strokeWidth={2}
           viewBox="0 0 24 24"
         >
