@@ -16,19 +16,20 @@ export default function ProjectCard({
 }: ProjectCardProps) {
   return (
     <div 
-      className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden transition-all duration-300 transform hover:scale-105 cursor-pointer"
+      className={`bg-[#EED5FB] rounded-2xl shadow-xl border border-[#CB90F1] 
+        overflow-hidden transition-all duration-300 transform hover:scale-105 hover:shadow-2xl
+        cursor-pointer flex flex-col items-center`}
       onClick={onClick}
     >
-      <div className="relative h-48">
-      </div>
-      <div className="p-6">
-        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+      <div className="relative h-6 w-full" />
+      <div className="p-6 flex flex-col items-center text-center">
+        <h3 className="text-2xl font-extrabold text-[#CB90F1] mb-1">
           {title}
         </h3>
         {subtitle ? (
-          <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">{subtitle}</p>
+          <p className="text-xs font-bold text-[#F49C9C] mb-2">{subtitle}</p>
         ) : null}
-        <p className="text-gray-600 dark:text-gray-400 text-sm">
+        <p className="text-[#7A3192] text-base font-medium">
           {description}
         </p>
       </div>
