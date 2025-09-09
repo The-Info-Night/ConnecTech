@@ -274,13 +274,15 @@ export default function SideNavbar() {
                 <a
                   href="/public_pages/login"
                   className={`
-                    flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-[#F18585] 
-                    hover:bg-[#EED5FB] hover:text-[#7A3192]
-                    transition ${open ? "justify-start" : "justify-center"}
+                    flex items-center gap-3 px-4 py-3 rounded-lg font-bold
+                    text-[#7A3192] hover:bg-white/80 hover:text-[#F18585]
+                    active:bg-[#E4BEF8] active:text-[#C174F2]
+                    shadow-sm transition
+                    ${open ? "justify-start" : "justify-center"}
                   `}
                   title="Login"
                 >
-                  <svg className="w-6 h-6" fill="none" stroke="#F18585" strokeWidth={2} viewBox="0 0 24 24">
+                  <svg className="w-6 h-6" fill="none" stroke="#7A3192" strokeWidth={2} viewBox="0 0 24 24">
                     <circle cx="12" cy="8" r="4" />
                     <path d="M4 20c0-4 4-7 8-7s8 3 8 7" />
                   </svg>
