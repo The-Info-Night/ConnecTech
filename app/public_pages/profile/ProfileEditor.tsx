@@ -20,7 +20,6 @@ export default function ProfileEditor() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Fetch profile on mount
   useEffect(() => {
     async function fetchProfile() {
       setLoading(true);
@@ -56,7 +55,6 @@ export default function ProfileEditor() {
     fetchProfile();
   }, []);
 
-  // Image upload + Supabase bucket logic
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file || !profile) return;
@@ -65,32 +63,29 @@ export default function ProfileEditor() {
     try {
       const fileExt = file.name.split('.').pop();
       const timestamp = Date.now();
-      // Chemin: "uuid/12345_filename.png"
       const filePath = `${profile.uuid}/${timestamp}_${file.name}`;
   
-      // Upload to bucket
+      console.log("profile.uuid =", profile?.uuid, "user id =", (await supabase.auth.getUser()).data.user?.id, "filePath =", filePath);
       const { error: uploadError } = await supabase
         .storage
         .from('profile_picture')
         .upload(filePath, file, { upsert: true });
       if (uploadError) throw uploadError;
   
-      // Get public URL
       const { data } = supabase
         .storage
         .from('profile_picture')
         .getPublicUrl(filePath);
       if (!data?.publicUrl) throw new Error('Could not get public URL.');
       setImageUrl(data.publicUrl);
+
   
-      // Update user's image_url in DB
       const { error: updateError } = await supabase
         .from('users')
         .update({ image_url: data.publicUrl })
         .eq('uuid', profile.uuid);
       if (updateError) throw updateError;
   
-      // Optionally update user metadata (auth)
       await supabase.auth.updateUser({
         data: { avatar_url: data.publicUrl },
       });
@@ -107,7 +102,6 @@ export default function ProfileEditor() {
   }
   
 
-  // Save updated profile (name/image_url manual field)
   async function handleSave() {
     if (!profile) return;
     setSaving(true);
@@ -147,7 +141,6 @@ export default function ProfileEditor() {
                 <path d="M4 20c0-4 4-7 8-7s8 3 8 7" />
               </svg>
             )}
-            {/* Petit bouton upload sur l'avatar : */}
             <button
               className="absolute bottom-2 right-2 bg-[#CB90F1] hover:bg-[#F18585] text-white rounded-full p-2 shadow focus:outline-none focus:ring-2 focus:ring-[#C174F2] transition"
               title="Change profile picture"
