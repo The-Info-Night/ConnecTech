@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { supabase } from "../../../lib/supabaseClient";
 
 type UserProfile = {
-  id: string;
+  uuid: string;
   email: string;
   image_url?: string | null;
   name?: string | null;
@@ -41,10 +41,15 @@ export default function ProfileEditor() {
 
       if (error) {
         setError(error.message);
-      } else {
-        setProfile(data);
-        setName(data?.name ?? "");
-        setImageUrl(data?.image_url ?? null);
+      } else if (data) {
+        setProfile({
+          uuid: data.id,
+          email: data.email,
+          name: data.name,
+          image_url: data.image_url,
+        });
+        setName(data.name ?? "");
+        setImageUrl(data.image_url ?? null);
       }
       setLoading(false);
     }
@@ -82,7 +87,7 @@ export default function ProfileEditor() {
       const { error: updateError } = await supabase
         .from('users')
         .update({ image_url: data.publicUrl })
-        .eq('id', profile.id);
+        .eq('id', profile.uuid);
       if (updateError) throw updateError;
   
       // Optionally update user metadata (auth)
@@ -109,7 +114,7 @@ export default function ProfileEditor() {
     setError(null);
 
     const updates = {
-      id: profile.id,
+      id: profile.uuid,
       name,
       image_url: imageUrl,
       updated_at: new Date().toISOString(),
