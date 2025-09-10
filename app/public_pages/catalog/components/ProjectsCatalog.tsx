@@ -110,7 +110,7 @@ export default function ProjectsCatalog() {
   };
 
   return (
-    <div className="w-full max-w-5xl flex flex-col items-center justify-center px-2 py-8">
+    <div className="w-full max-w-5xl mx-auto flex flex-col items-center justify-center px-2 py-8">
       <h2 className="text-3xl md:text-5xl font-extrabold text-center mb-10 text-[#7A3192] drop-shadow-lg">
         Startup catalog
       </h2>
@@ -159,7 +159,7 @@ export default function ProjectsCatalog() {
       ) : startups.length === 0 ? (
         <p className="text-center text-[#7A3192]/80">No results</p>
       ) : (
-        <div className="w-full max-w-5xl grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+        <div className="w-full max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
           {startups.map((startup) => (
             <ProjectCard
               key={startup.id}
