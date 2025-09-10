@@ -1,9 +1,17 @@
 import { NextResponse } from "next/server";
-import { supabaseServer } from "@/lib/supabaseServer";
+import { getSupabaseWithAuth } from "@/lib/supabaseServer";
 
-export async function GET() {
+function getTokenFromRequest(request: Request) {
+  const authHeader = request.headers.get("authorization");
+  return authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
+}
+
+export async function GET(request: Request) {
+  const token = getTokenFromRequest(request);
+  const supabase = getSupabaseWithAuth(token ?? "");
+
   try {
-    const { data, error } = await supabaseServer.from("users").select("*");
+    const { data, error } = await supabase.from("users").select("*");
     if (error) throw error;
     return NextResponse.json({ users: data ?? [] });
   } catch (err: any) {
@@ -15,10 +23,13 @@ export async function GET() {
 }
 
 export async function PATCH(request: Request) {
+  const token = getTokenFromRequest(request);
+  const supabase = getSupabaseWithAuth(token ?? "");
+
   const body = await request.json();
   const { uuid, values } = body as { uuid: string; values: Record<string, unknown> };
 
-  const { data, error } = await supabaseServer
+  const { data, error } = await supabase
     .from("users")
     .update(values)
     .eq("uuid", uuid)
