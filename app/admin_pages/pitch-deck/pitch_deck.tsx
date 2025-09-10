@@ -2,37 +2,71 @@
 
 import { useRef, useState, useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
-import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 import Link from "next/link";
+import { PDFDownloadLink, Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
 import { Download } from "lucide-react";
+
+const styles = StyleSheet.create({
+  page: { padding: 30, fontSize: 12, fontFamily: "Helvetica" },
+  title: { fontSize: 22, fontWeight: "bold", marginBottom: 12 },
+  subtitle: { fontSize: 16, fontWeight: "bold", marginTop: 12, marginBottom: 6 },
+  paragraph: { marginBottom: 8 },
+  listItem: { marginLeft: 12, marginBottom: 4 },
+});
+
+const PitchPdf = (
+  <Document>
+    <Page size="A4" style={styles.page}>
+      <Text style={styles.title}>Connectech Pitch Deck</Text>
+
+      <Text style={styles.subtitle}>The Problem</Text>
+      <Text style={styles.listItem}>• Current solutions are inefficient and outdated</Text>
+      <Text style={styles.listItem}>• Businesses lose $X billion annually due to inefficiencies</Text>
+      <Text style={styles.listItem}>• No integrated platform addresses all customer needs</Text>
+
+      <Text style={styles.subtitle}>Our Solution</Text>
+      <Text style={styles.paragraph}>
+        A comprehensive SaaS solution that increases efficiency by 40%, reduces costs by 30%, improves customer satisfaction, and offers a scalable architecture.
+      </Text>
+
+      <Text style={styles.subtitle}>Market Opportunity</Text>
+      <Text style={styles.listItem}>• TAM: $42B</Text>
+      <Text style={styles.listItem}>• SAM: $12B</Text>
+      <Text style={styles.listItem}>• SOM: $850M</Text>
+
+      <Text style={styles.subtitle}>Traction</Text>
+      <Text style={styles.listItem}>• 42% MoM Growth</Text>
+      <Text style={styles.listItem}>• 250+ Active Clients</Text>
+      <Text style={styles.listItem}>• 98% Retention Rate</Text>
+      <Text style={styles.paragraph}>Recent milestones: Closed $5M Series A funding, launched v2.0 with AI capabilities, and partnership with Industry Leader Inc.</Text>
+
+      <Text style={styles.subtitle}>Business Model</Text>
+      <Text style={styles.listItem}>• SaaS Subscription ($99–499/mo, tiered pricing)</Text>
+      <Text style={styles.listItem}>• Enterprise (Custom, white-label solutions)</Text>
+      <Text style={styles.listItem}>• Marketplace (15% transaction commission)</Text>
+
+      <Text style={styles.subtitle}>Our Team</Text>
+      <Text style={styles.listItem}>• Jane Doe – CEO, Former Google PM</Text>
+      <Text style={styles.listItem}>• John Smith – CTO, Ex-Microsoft</Text>
+      <Text style={styles.listItem}>• Alice Johnson – CPO, UX Expert</Text>
+      <Text style={styles.listItem}>• Robert Brown – CFO, Financial Strategist</Text>
+
+      <Text style={styles.subtitle}>Financial Projections</Text>
+      <Text style={styles.listItem}>• 2024: Revenue $2.5M, Gross Margin 75%, Customers 850</Text>
+      <Text style={styles.listItem}>• 2025: Revenue $8.7M, Gross Margin 78%, Customers 2400</Text>
+      <Text style={styles.listItem}>• 2026: Revenue $22.4M, Gross Margin 82%, Customers 5800</Text>
+
+      <Text style={styles.subtitle}>Fundraising</Text>
+      <Text style={styles.paragraph}>We’re raising $8M (already $5M committed, $3M remaining).</Text>
+      <Text style={styles.paragraph}>Contact: invest@.com</Text>
+    </Page>
+  </Document>
+);
 
 export default function PitchDeckPage({ sidebarOpen = false }: { sidebarOpen?: boolean }) {
   const contentRef = useRef<HTMLDivElement | null>(null);
-  const [loadingExport, setLoadingExport] = useState(false);
-
-  const handleExport = async () => {
-    if (!contentRef.current) return;
-    setLoadingExport(true);
-    try {
-      const canvas = await html2canvas(contentRef.current, {
-        scale: 2,
-        backgroundColor: "#ffffff"
-      });
-      const imgData = canvas.toDataURL("image/png");
-
-      const pdf = new jsPDF("p", "mm", "a4");
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-
-      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-      pdf.save("pitch-deck.pdf");
-    } catch (err) {
-      console.error("❌ Error exporting PDF:", err);
-    } finally {
-      setLoadingExport(false);
-    }
-  };
 
   const PALETTE = {
     rose: "#F18585",
@@ -285,15 +319,20 @@ export default function PitchDeckPage({ sidebarOpen = false }: { sidebarOpen?: b
             </div>
           </section>
 
-          <div className="group mt-8 max-w-6xl mx-auto px-4 sm:px-0">
-            <button
-              onClick={handleExport}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-[#EED5FB] text-[#7A3192] font-bold shadow hover:bg-[#CB90F1]/10 transition"
-              disabled={loadingExport}
-            >
-              <Download className="w-5 h-5" />
-              {loadingExport ? "Exporting..." : "Extract as PDF"}
-            </button>
+          <div className="mt-8 text-center">
+          <PDFDownloadLink
+            document={PitchPdf}
+            fileName="pitch-deck.pdf"
+          >
+            {({ loading }) => (
+              <button
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-[#EED5FB] text-[#7A3192] font-bold shadow hover:bg-[#CB90F1]/10 transition"
+              >
+                <Download className="w-5 h-5" />
+                {loading ? "Preparing..." : "Extract as PDF"}
+              </button>
+            )}
+          </PDFDownloadLink>
           </div>
         </div>
       </main>
