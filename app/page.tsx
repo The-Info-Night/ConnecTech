@@ -1,31 +1,30 @@
 "use client";
-import Image from "next/image";
-import { useState } from "react";
+import ProjectsCatalog from "./public_pages/catalog/components/ProjectsCatalog";
 import SideNavbar from "./components/SideNavbar";
 
-export default function Home() {
+export default function CatalogHome() {
   return (
     <div
-      className="font-sans min-h-screen bg-white dark:bg-black relative"
+      className="font-sans min-h-screen w-full"
       style={{
-        backgroundImage: 'url("/background.png")',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
+        background: `
+          linear-gradient(110deg, 
+            #F18585 0%,
+            #F49C9C 10%,
+            #F6AEAE 26%,
+            #F8CACF 48%,
+            #EED5FB 72%,
+            #CB90F1 88%, 
+            #C174F2 100%)
+        `,
       }}
     >
-      {/* Side Navbar */}
       <SideNavbar />
-      {/* Main content placeholder */}
-      <main className="flex flex-col items-center justify-center min-h-[70vh] py-16 ml-0 md:ml-56 transition-all duration-300"
+      <main
+        className="flex flex-col items-center justify-center min-h-[70vh] w-full py-16 ml-0 md:ml-56 transition-all duration-300"
         style={{ marginLeft: "var(--side-navbar-width, 14rem)" }}
       >
-        <h1 className="text-3xl font-bold mb-4 text-gray-900 dark:text-gray-100">
-          Welcome to Connectech Public Home Page!
-        </h1>
-        <p className="text-gray-600 dark:text-gray-300 text-lg">
-          Select a section from the navigation bar to get started.
-        </p>
+        <ProjectsCatalog />
       </main>
       <style jsx global>{`
         @media (min-width: 768px) {
