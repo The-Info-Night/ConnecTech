@@ -53,19 +53,18 @@ export default function NewsListContent() {
   return (
     <main className="w-full flex flex-col items-center px-2 sm:px-4 md:px-8 pt-14 pb-8 min-h-[76vh]">
       <section className="w-full max-w-2xl mx-auto">
-        <h1 className="text-2xl sm:text-3xl font-bold mb-8 text-gray-100 text-center">
+        <h1 className="text-2xl sm:text-3xl font-extrabold mb-8 text-[#7A3192] text-center drop-shadow-lg">
           News
         </h1>
-
         {error && (
           <p className="text-red-400 mb-4 text-center">{error}</p>
         )}
         {loading ? (
-          <p className="text-gray-400 text-center">Loading...</p>
+          <p className="text-[#CB90F1] text-center">Loading...</p>
         ) : news.length === 0 ? (
-          <p className="text-gray-400 text-center">No news</p>
+          <p className="text-[#CB90F1] text-center">No news</p>
         ) : (
-          <ul className="flex flex-col gap-4">
+          <ul className="flex flex-col gap-5">
             {news
               .sort(
                 (a, b) =>
@@ -76,12 +75,16 @@ export default function NewsListContent() {
                 <li key={item.id}>
                   <a
                     href={`/public_pages/news/${item.id}`}
-                    className="block bg-gray-800 rounded-lg px-4 py-4 transition hover:bg-gray-700"
+                    className={`
+                      block rounded-xl px-5 py-5 bg-white/80 border-2 border-[#EED5FB]
+                      shadow hover:bg-[#EED5FB]/90 hover:shadow-lg
+                      transition
+                    `}
                   >
-                    <h2 className="text-lg sm:text-xl font-semibold text-white mb-1">
+                    <h2 className="text-lg sm:text-xl font-bold text-[#7A3192] mb-1">
                       {item.title}
                     </h2>
-                    <div className="text-xs text-gray-400 mt-1 flex flex-wrap gap-x-3 gap-y-1">
+                    <div className="text-xs text-[#CB90F1] mt-1 flex flex-wrap gap-x-3 gap-y-1">
                       {item.news_date && <span>{formatDate(item.news_date)}</span>}
                       {item.location && <span>• {item.location}</span>}
                       {item.category && <span>• {item.category}</span>}

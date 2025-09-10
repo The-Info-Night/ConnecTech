@@ -3,20 +3,16 @@ import CatalogMessages from "./catalogMessages";
 
 export default function MessagesPage() {
   return (
-    <div className="min-h-screen bg-gray-900 text-white flex">
+    <div className="min-h-screen bg-gradient-to-br from-[#F18585] via-[#CB90F1] to-[#EED5FB]">
       <SideNavbar />
-      <main className="flex-1 overflow-auto px-4 py-8">
-        <header className="max-w-4xl mx-auto mb-6">
-          <h1 className="text-2xl font-semibold tracking-tight text-center lg:text-left">Messages</h1>
-          <p className="text-neutral-400 mt-1 max-w-md text-center lg:text-left">
-            View and manage your conversations.
-          </p>
-        </header>
-
-        <section id="messaging" className="max-w-4xl mx-auto">
+      <div className="lg:ml-20 p-6">
+        <div className="max-w-7xl mx-auto">
+          <h1 className="text-3xl font-bold mb-6" style={{ color: "#7A3192" }}>
+            Messages
+          </h1>
           <CatalogMessages />
-        </section>
-      </main>
+        </div>
+      </div>
     </div>
   );
 }

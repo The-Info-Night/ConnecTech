@@ -1,5 +1,4 @@
 "use client";
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
 
@@ -18,7 +17,7 @@ export default function StartUpDashboardContent() {
     { id: "engagementRate", label: "Engagement Rate", value: "0", icon: "💬", trend: "Stable" },
     { id: "investors", label: "Active Investors", value: 1500, icon: "💰", trend: "+5 new" },
     { id: "funding", label: "Total Funding (M€)", value: 42, icon: "💎", trend: "+2.5M€ this quarter" },
-    { id: "partnerships", label: "Partnerships", value: 18, icon: "🤝", trend: "+3 this month" },
+    { id: "partnerships", label: "Partnerships", value: 18, icon: "🤝", trend: "+3 this month" }
   ]);
   const [loading, setLoading] = useState(true);
 
@@ -30,7 +29,6 @@ export default function StartUpDashboardContent() {
           .select("*")
           .limit(1)
           .maybeSingle<DashboardRow>();
-
         if (!error && data) {
           setStatistics([
             { id: "startups", label: "Startups", value: data.startup_nb ?? 0, icon: "🚀", trend: "+12% this month" },
@@ -45,11 +43,11 @@ export default function StartUpDashboardContent() {
                     : String(data.engagment_rate)
                   : "0%",
               icon: "💬",
-              trend: "Stable",
+              trend: "Stable"
             },
             { id: "investors", label: "Active Investors", value: 1500, icon: "💰", trend: "+5 new" },
             { id: "funding", label: "Total Funding (M€)", value: 42, icon: "💎", trend: "+2.5M€ this quarter" },
-            { id: "partnerships", label: "Partnerships", value: 18, icon: "🤝", trend: "+3 this month" },
+            { id: "partnerships", label: "Partnerships", value: 18, icon: "🤝", trend: "+3 this month" }
           ]);
         }
       } catch (e) {
@@ -58,91 +56,96 @@ export default function StartUpDashboardContent() {
         setLoading(false);
       }
     }
-
     fetchStatistics();
   }, []);
 
-  if (loading) return <p className="p-6 text-center text-gray-400">Loading...</p>;
+  if (loading) return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#F18585] via-[#CB90F1] to-[#C174F2]">
+      <p className="text-2xl text-white font-semibold">Loading...</p>
+    </div>
+  );
 
   return (
-      <main className="mx-auto max-w-7xl px-4 py-10 ml-0 lg:ml-20 transition-all duration-300">
-        <header className="mb-8 flex flex-col items-center text-center">
-        <h1 className="text-3xl font-semibold tracking-tight text-gray-900 dark:text-white">
-          Startup Dashboard
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400">
-          Overview of your startup ecosystem performance and statistics
-        </p>
-      </header>
-
-      <section className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {statistics.map(({ id, label, value, icon, trend }) => (
-          <article
-            key={id}
-            className="rounded-xl border border-neutral-200/60 bg-white p-6 shadow-sm transition hover:shadow-md dark:border-neutral-800/60 dark:bg-neutral-900"
-          >
-            <div className="flex justify-between items-start">
-              <div className="flex items-center gap-3">
-                <span className="text-2xl">{icon}</span>
-                <h2 className="text-sm font-medium text-neutral-500 dark:text-neutral-400">{label}</h2>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-[#F18585] via-[#CB90F1] to-[#C174F2] py-8 px-2">
+      <main className="flex flex-col items-center w-full max-w-5xl">
+        <header className="mb-8 flex flex-col items-center">
+          <h1 className="text-4xl font-extrabold text-[#7A3192] drop-shadow-lg text-center tracking-tight">Startup Dashboard</h1>
+          <p className="text-lg text-[#a735f0] mt-2 text-center tracking-wide">
+            Overview of your startup ecosystem performance and statistics
+          </p>
+        </header>
+        <section className="w-full grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 justify-items-center mb-8">
+          {statistics.map(({ id, label, value, icon, trend }) => (
+            <article
+              key={id}
+              className="
+                flex flex-col items-center justify-center
+                bg-white bg-opacity-70 rounded-2xl px-6 py-8
+                shadow-lg border-2 border-[#EED5FB]
+                min-w-[220px] max-w-xs w-full
+              "
+            >
+              <div className="flex items-center gap-3 mb-2">
+                <span className="text-3xl">{icon}</span>
+                <h2 className="text-lg font-semibold text-[#7A3192]">{label}</h2>
               </div>
-              <p className="mt-3 text-3xl font-semibold text-neutral-900 dark:text-neutral-100">
+              <p className="text-4xl font-extrabold text-[#C174F2] text-center mb-2">
                 {typeof value === "number" ? value.toLocaleString() : value}
               </p>
+              <p className="mt-1 text-sm font-medium text-[#F49C9C]">{trend}</p>
+            </article>
+          ))}
+        </section>
+        <section className="w-full grid grid-cols-1 md:grid-cols-2 gap-8 mb-8 justify-items-center">
+          <div className="w-full max-w-md bg-white bg-opacity-60 rounded-2xl p-6 shadow-lg border border-[#F6AEAE] flex flex-col items-center">
+            <h3 className="text-xl font-bold text-[#F18585] mb-3">Featured Startups</h3>
+            <div className="w-full flex flex-col gap-4">
+              {[
+                { name: "EcoTech", sector: "Green Technology", growth: "+32%" },
+                { name: "HealthAI", sector: "Digital Health", growth: "+28%" },
+                { name: "FinNext", sector: "FinTech", growth: "+45%" }
+              ].map(({ name, sector, growth }, idx) => (
+                <div key={idx} className="flex justify-between items-center w-full border-b border-[#EED5FB] pb-2 last:border-none">
+                  <div>
+                    <p className="font-medium text-[#7A3192]">{name}</p>
+                    <p className="text-sm text-[#CB90F1]">{sector}</p>
+                  </div>
+                  <span className="flex items-center justify-center rounded-full bg-[#E4BEF8] min-w-[46px] h-8 px-3 text-xs font-semibold text-[#7A3192]">
+                    {growth}
+                  </span>
+                </div>
+              ))}
             </div>
-            <p className="mt-2 text-xs font-medium text-green-600 dark:text-green-500">{trend}</p>
-          </article>
-        ))}
-      </section>
-
-      <section className="mt-10 grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="rounded-xl border border-neutral-200/60 bg-white p-6 shadow-sm dark:border-neutral-800/60 dark:bg-neutral-900">
-          <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100">Featured Startups</h3>
-          <div className="mt-4 space-y-4">
-            {[
-              { name: "EcoTech", sector: "Green Technology", growth: "+32%" },
-              { name: "HealthAI", sector: "Digital Health", growth: "+28%" },
-              { name: "FinNext", sector: "FinTech", growth: "+45%" },
-            ].map(({ name, sector, growth }, idx) => (
-              <div key={idx} className="flex justify-between border-b border-neutral-200/60 dark:border-neutral-800/60 py-3">
-                <div>
-                  <p className="font-medium">{name}</p>
-                  <p className="text-sm text-neutral-500 dark:text-neutral-400">{sector}</p>
-                </div>
-                <span className="flex items-center justify-center rounded-full bg-green-100 dark:bg-green-900/40 min-w-[48px] h-8 px-3 text-xs font-medium text-green-800 dark:text-green-300">
-                  {growth}
-                </span>
-              </div>
-            ))}
           </div>
-        </div>
-
-        <div className="rounded-xl border border-neutral-200/60 bg-white p-6 shadow-sm dark:border-neutral-800/60 dark:bg-neutral-900">
-          <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100">Recent Investors</h3>
-          <div className="mt-4 space-y-4">
-            {[
-              { name: "VC Capital Plus", amount: "2.5M€", startup: "HealthAI" },
-              { name: "Green Funds", amount: "1.8M€", startup: "EcoTech" },
-              { name: "TechGrowth", amount: "3.2M€", startup: "FinNext" },
-            ].map(({ name, amount, startup }, idx) => (
-              <div key={idx} className="flex justify-between border-b border-neutral-200/60 dark:border-neutral-800/60 py-3">
-                <div>
-                  <p className="font-medium">{name}</p>
-                  <p className="text-sm text-neutral-500 dark:text-neutral-400">Invested in {startup}</p>
+          <div className="w-full max-w-md bg-white bg-opacity-60 rounded-2xl p-6 shadow-lg border border-[#C174F2] flex flex-col items-center">
+            <h3 className="text-xl font-bold text-[#CB90F1] mb-3">Recent Investors</h3>
+            <div className="w-full flex flex-col gap-4">
+              {[
+                { name: "VC Capital Plus", amount: "2.5M€", startup: "HealthAI" },
+                { name: "Green Funds", amount: "1.8M€", startup: "EcoTech" },
+                { name: "TechGrowth", amount: "3.2M€", startup: "FinNext" },
+              ].map(({ name, amount, startup }, idx) => (
+                <div key={idx} className="flex justify-between items-center w-full border-b border-[#EED5FB] pb-2 last:border-none">
+                  <div>
+                    <p className="font-medium text-[#7A3192]">{name}</p>
+                    <p className="text-sm text-[#CB90F1]">Invested in {startup}</p>
+                  </div>
+                  <span className="text-sm font-semibold text-[#C174F2] bg-[#F6AEAE]/40 px-3 py-1 rounded-xl">{amount}</span>
                 </div>
-                <span className="text-sm font-semibold text-blue-600 dark:text-blue-400">{amount}</span>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
-
-      <section className="mt-10 rounded-xl border border-neutral-200/60 bg-white p-6 shadow-sm dark:border-neutral-800/60 dark:bg-neutral-900">
-        <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100">Notes</h3>
-        <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">
-          Data displayed is from the table <code>data_adm_dashboard</code>. If empty or unavailable, sample data is shown.
-        </p>
-      </section>
-    </main>
+        </section>
+        <section className="w-full flex flex-col items-center">
+          <div className="rounded-2xl bg-white bg-opacity-60 p-6 shadow border border-[#F49C9C] text-center max-w-xl w-full">
+            <h3 className="text-lg font-bold text-[#F49C9C] mb-2">Notes</h3>
+            <p className="text-base text-[#7A3192]">
+              Data displayed is from the table <code>data_adm_dashboard</code>.<br />
+              If empty or unavailable, sample data is shown.
+            </p>
+          </div>
+        </section>
+      </main>
+    </div>
   );
 }

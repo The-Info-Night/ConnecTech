@@ -85,7 +85,6 @@ export default function ProjectsCatalog() {
           setStatuses(statusesData);
         }
       } catch {
-        // Ignore errors here silently
       }
     }
     loadOptions();
@@ -111,24 +110,23 @@ export default function ProjectsCatalog() {
   };
 
   return (
-    <div className="w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <h2 className="text-2xl md:text-4xl font-extrabold text-center mb-8 text-gray-900 dark:text-gray-100">
+    <div className="w-full max-w-5xl flex flex-col items-center justify-center px-2 py-8">
+      <h2 className="text-3xl md:text-5xl font-extrabold text-center mb-10 text-[#7A3192] drop-shadow-lg">
         Startup catalog
       </h2>
 
-      {/* Filtres alignés et responsive */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <div className="w-full max-w-5xl grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-10">
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search for a startup by name or description..."
-          className="col-span-1 sm:col-span-2 md:col-span-2 w-full px-4 py-3 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="col-span-1 sm:col-span-2 md:col-span-2 w-full px-4 py-3 rounded-lg border border-[#CB90F1] bg-[#EED5FB] text-[#7A3192] placeholder-[#CB90F1]/80 focus:outline-none focus:ring-2 focus:ring-[#C174F2]"
         />
         <select
           value={sector}
           onChange={(e) => setSector(e.target.value)}
-          className="w-full px-4 py-3 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-4 py-3 rounded-lg border border-[#F8CACF] bg-[#F6AEAE] text-[#7A3192] focus:outline-none focus:ring-2 focus:ring-[#CB90F1]"
         >
           <option value="">Sector (all)</option>
           {sectors.map((s) => (
@@ -141,7 +139,7 @@ export default function ProjectsCatalog() {
         <select
           value={status}
           onChange={(e) => setStatus(e.target.value)}
-          className="w-full px-4 py-3 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-4 py-3 rounded-lg border border-[#F8CACF] bg-[#F6AEAE] text-[#7A3192] focus:outline-none focus:ring-2 focus:ring-[#CB90F1]"
         >
           <option value="">Status (all)</option>
           {statuses.map((s) => (
@@ -157,11 +155,11 @@ export default function ProjectsCatalog() {
       )}
 
       {loading ? (
-        <p className="text-center text-gray-500 dark:text-gray-400">Loading...</p>
+        <p className="text-center text-[#7A3192]/80">Loading...</p>
       ) : startups.length === 0 ? (
-        <p className="text-center text-gray-500 dark:text-gray-400">No results</p>
+        <p className="text-center text-[#7A3192]/80">No results</p>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        <div className="w-full max-w-5xl grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
           {startups.map((startup) => (
             <ProjectCard
               key={startup.id}
@@ -186,7 +184,6 @@ export default function ProjectsCatalog() {
   );
 }
 
-// Debounce helper
 function useDebouncedValue(value: string, delayMs: number) {
   const [debounced, setDebounced] = useState(value);
   useEffect(() => {

@@ -23,7 +23,6 @@ export default function NewsDetailContent() {
 
   useEffect(() => {
     let isCancelled = false;
-
     async function load() {
       if (!id) return;
       setLoading(true);
@@ -42,7 +41,6 @@ export default function NewsDetailContent() {
         if (!isCancelled) setLoading(false);
       }
     }
-
     load();
     return () => {
       isCancelled = true;
@@ -56,34 +54,44 @@ export default function NewsDetailContent() {
   };
 
   return (
-    <main
-      className="flex flex-col items-center justify-start min-h-[70vh] py-10 px-4 sm:px-6 md:px-12 lg:px-20 max-w-4xl mx-auto"
-      style={{ marginTop: "56px" }}
+    <div
+      className="min-h-screen w-full font-sans"
+      style={{
+        background:
+          "linear-gradient(180deg, #F18585 0%, #F49C9C 18%, #F6AEAE 34%, #F8CACF 50%, #EED5FB 56%, #E4BEF8 72%, #D5A8F2 85%, #CB90F1 94%, #C174F2 100%)",
+      }}
     >
-      <button
-        type="button"
-        onClick={() => router.push("/public_pages/news")}
-        className="text-sm text-blue-500 hover:underline mb-6 self-start"
+      <main
+        className="flex flex-col items-center min-h-[70vh] py-10 px-4 sm:px-6 md:px-12 lg:px-20 max-w-3xl mx-auto"
+        style={{ marginTop: "56px" }}
       >
-        ← Back
-      </button>
+        <button
+          type="button"
+          onClick={() => router.push("/public_pages/news")}
+          className="text-sm text-[#b046d4] hover:text-[#F18585] font-semibold mb-6 self-start transition"
+        >
+          ← Back
+        </button>
 
-      {error && <p className="text-center text-red-500">{error}</p>}
+        {error && <p className="text-center text-red-500">{error}</p>}
 
-      {loading ? (
-        <p className="text-center text-gray-400">Loading...</p>
-      ) : item ? (
-        <article className="bg-gray-800 dark:bg-gray-900 rounded-lg p-6 text-white w-full">
-          <h1 className="text-3xl font-bold mb-4">{item.title}</h1>
-          <div className="text-sm text-gray-400 flex flex-wrap gap-x-4 gap-y-2">
-            {item.news_date && <span>{formatDate(item.news_date)}</span>}
-            {item.location && <span>{item.location}</span>}
-            {item.category && <span>{item.category}</span>}
-          </div>
-        </article>
-      ) : (
-        <p className="text-center text-gray-400">Not found</p>
-      )}
-    </main>
+        {loading ? (
+          <p className="text-center text-[#CB90F1]">Loading...</p>
+        ) : item ? (
+          <article className="bg-white rounded-xl p-8 w-full max-w-2xl border-2 border-[#EED5FB] shadow mx-auto">
+            <h1 className="text-3xl font-extrabold mb-4 text-[#7A3192] text-left w-full break-words leading-snug">
+              {item.title}
+            </h1>
+            <div className="text-sm text-[#CB90F1] mb-4 flex flex-wrap gap-x-4 gap-y-2">
+              {item.news_date && <span>{formatDate(item.news_date)}</span>}
+              {item.location && <span>{item.location}</span>}
+              {item.category && <span>{item.category}</span>}
+            </div>
+          </article>
+        ) : (
+          <p className="text-center text-[#CB90F1]">Not found</p>
+        )}
+      </main>
+    </div>
   );
 }

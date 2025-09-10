@@ -4,7 +4,13 @@ import NewsDetailContent from "../components/NewsDetailContent";
 
 export default function NewsDetailPage() {
   return (
-    <div className="font-sans min-h-screen bg-[#1A1B21] dark:bg-[#1A1B21]">
+    <div
+      className="font-sans min-h-screen w-full"
+      style={{
+        background:
+          "linear-gradient(180deg, #F18585 0%, #F49C9C 18%, #F6AEAE 34%, #F8CACF 50%, #EED5FB 56%, #E4BEF8 72%, #D5A8F2 85%, #CB90F1 94%, #C174F2 100%)",
+      }}
+    >
       <SideNavbar />
       <NewsDetailContent />
     </div>
