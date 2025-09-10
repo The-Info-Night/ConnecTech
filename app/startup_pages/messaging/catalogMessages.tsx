@@ -74,6 +74,7 @@ export default function CatalogMessages() {
           messages={messages}
           currentUser={currentUser}
           selectedUser={selectedUser}
+          users={users}
         />
         <ChatInput
           onSendMessage={sendMessage}
