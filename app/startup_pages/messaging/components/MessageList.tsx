@@ -52,7 +52,7 @@ export default function MessageList({ messages, currentUser, selectedUser, users
         ) : (
           messages.map(msg => {
             const isOwn = msg.sender_id === currentUser?.uuid;
-            const senderName = isOwn ? "You" : (nameByUuid[msg.sender_id] || msg.sender_id);
+            const senderName = isOwn ? "You" : (nameByUuid[msg.sender_id] || "Unknown user");
 
             return (
               <div key={msg.id} className={`flex ${isOwn ? "justify-end" : "justify-start"}`}>
