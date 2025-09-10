@@ -48,6 +48,16 @@ const NAV_SECTIONS: { category: string; items: NavItem[] }[] = [
         ),
         href: "/admin_pages/pitch-deck",
       },
+      {
+        name: "Users",
+        icon: (
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+            <circle cx="12" cy="7" r="4" />
+            <path d="M4 21c0-4 4-7 8-7s8 3 8 7" />
+          </svg>
+        ),
+        href: "/admin_pages/users",
+      },
     ],
   },
   {
