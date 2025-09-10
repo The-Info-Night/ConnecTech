@@ -21,19 +21,14 @@ export default function CatalogMessages() {
   const [newConversationUserId, setNewConversationUserId] = useState('');
 
   const handleStartConversation = (userId: string) => {
-    console.log("handleStartConversation called with:", userId);
-    console.log("Selected user before:", selectedUser);
     
     const selectedUserResult = startNewConversation(userId);
-    console.log("Selected user after startNewConversation:", selectedUserResult);
     
     if (selectedUserResult) {
       setShowNewConversationForm(false);
       setNewConversationUserId('');
-      console.log("Manually setting selected user:", selectedUserResult);
       setSelectedUser(selectedUserResult);
     } else {
-      console.log("No user returned from startNewConversation");
     }
   };
 
@@ -42,17 +37,10 @@ export default function CatalogMessages() {
   };
 
   const handleSelectUser = (user: any) => {
-    console.log("Selecting user:", user);
     setSelectedUser(user);
     setShowNewConversationForm(false);
   };
 
-  console.log("Current states:", {
-    selectedUser,
-    conversations: conversations.length,
-    users: users.length,
-    currentUser
-  });
 
   return (
     <div className="flex h-[80vh] w-full border rounded-lg overflow-hidden shadow-lg">

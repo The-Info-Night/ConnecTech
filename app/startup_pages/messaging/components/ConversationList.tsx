@@ -79,7 +79,6 @@ export default function ConversationList({
   style={{ backgroundColor: PASTEL.violet, color: "#fff" }}
   disabled={!newConversationUserId}
   onClick={() => {
-    console.log("Starting conversation with:", newConversationUserId);
     onStartConversation(newConversationUserId);
   }}
 >
