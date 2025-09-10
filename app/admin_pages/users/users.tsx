@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
+import { supabase } from "@/lib/supabaseClient";
 
 type DbUser = {
   id: number;
@@ -23,7 +24,12 @@ export default function UsersAdminPage() {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch("/api/users", { cache: "no-store" });
+        const { data: sessionData } = await supabase.auth.getSession();
+        const token = sessionData?.session?.access_token;
+        const res = await fetch("/api/users", {
+          cache: "no-store",
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
         const json = await res.json();
         if (!res.ok) throw new Error(json.error || "Failed to load users");
         setUsers(json.users || []);
@@ -58,9 +64,14 @@ export default function UsersAdminPage() {
   async function saveUser(uuid: string, values: Partial<DbUser>) {
     setSavingId(uuid);
     try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData?.session?.access_token;
       const res = await fetch("/api/users", {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify({ uuid, values }),
       });
       const json = await res.json();
