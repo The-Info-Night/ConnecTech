@@ -15,3 +15,10 @@ if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
 export const supabaseServer = createClient(supabaseUrl, serviceRoleKey, {
   auth: { persistSession: false },
 });
+
+export function getSupabaseWithAuth(token: string) {
+  return createClient(supabaseUrl, serviceRoleKey, {
+    global: { headers: { Authorization: `Bearer ${token}` } },
+    auth: { persistSession: false },
+  });
+}
