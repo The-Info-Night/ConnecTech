@@ -31,6 +31,10 @@ export default function ProjectsCatalog() {
   const [status, setStatus] = useState("");
   const [sectors, setSectors] = useState<string[]>([]);
   const [statuses, setStatuses] = useState<string[]>([]);
+  const [maturities, setMaturities] = useState<string[]>([]);
+  const [needOptions, setNeedOptions] = useState<string[]>([]);
+  const [maturity, setMaturity] = useState("");
+  const [needsFilter, setNeedsFilter] = useState("");
   const [selectedStartup, setSelectedStartup] = useState<Startup | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -43,7 +47,7 @@ export default function ProjectsCatalog() {
       setError(null);
       try {
         const hasFilters = sector !== "" || status !== "";
-        if (debouncedQuery.trim() === "" && !hasFilters) {
+        if (debouncedQuery.trim() === "" && !hasFilters && maturity === "" && needsFilter === "") {
           const data = await getRows<Startup>(
             "startups",
             "id,name,description,sector,project_status,website_url,legal_status,address,email,phone,social_media_url,maturity,needs,founders"
@@ -52,7 +56,7 @@ export default function ProjectsCatalog() {
         } else {
           const data = await getFilteredStartups({
             sector: sector || null,
-            project_status: status || null,
+            maturity: maturity || null,
             search: debouncedQuery || null,
             limit: 200,
           });
@@ -70,19 +74,19 @@ export default function ProjectsCatalog() {
     return () => {
       isCancelled = true;
     };
-  }, [debouncedQuery, sector, status]);
+  }, [debouncedQuery, sector, status, maturity, needsFilter]);
 
   useEffect(() => {
     let isCancelled = false;
     async function loadOptions() {
       try {
-        const [sectorsData, statusesData] = await Promise.all([
+        const [sectorsData, maturitiesData] = await Promise.all([
           getDistinctValues("startups", "sector"),
-          getDistinctValues("startups", "project_status"),
+          getDistinctValues("startups", "maturity"),
         ]);
         if (!isCancelled) {
           setSectors(sectorsData);
-          setStatuses(statusesData);
+          setMaturities(maturitiesData);
         }
       } catch {
       }
@@ -115,13 +119,13 @@ export default function ProjectsCatalog() {
         Startup catalog
       </h2>
 
-      <div className="w-full max-w-5xl grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+      <div className="w-full max-w-5xl grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-10">
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search for a startup by name or description..."
-          className="col-span-1 sm:col-span-2 md:col-span-2 w-full px-4 py-3 rounded-lg border border-[#CB90F1] bg-[#EED5FB] text-[#7A3192] placeholder-[#CB90F1]/80 focus:outline-none focus:ring-2 focus:ring-[#C174F2]"
+          className="col-span-1 sm:col-span-2 md:col-span-2 lg:col-span-2 w-full px-4 py-3 rounded-lg border border-[#CB90F1] bg-[#EED5FB] text-[#7A3192] placeholder-[#CB90F1]/80 focus:outline-none focus:ring-2 focus:ring-[#C174F2]"
         />
         <select
           value={sector}
@@ -137,17 +141,18 @@ export default function ProjectsCatalog() {
         </select>
 
         <select
-          value={status}
-          onChange={(e) => setStatus(e.target.value)}
+          value={maturity}
+          onChange={(e) => setMaturity(e.target.value)}
           className="w-full px-4 py-3 rounded-lg border border-[#F8CACF] bg-[#F6AEAE] text-[#7A3192] focus:outline-none focus:ring-2 focus:ring-[#CB90F1]"
         >
-          <option value="">Status (all)</option>
-          {statuses.map((s) => (
-            <option key={s} value={s}>
-              {s}
+          <option value="">Maturity (all)</option>
+          {maturities.map((m) => (
+            <option key={m} value={m}>
+              {m}
             </option>
           ))}
         </select>
+
       </div>
 
       {error && (

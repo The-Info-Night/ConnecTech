@@ -93,19 +93,27 @@ export async function searchStartups(query: string, limit = 30): Promise<Startup
 export async function getFilteredStartups(params: {
   sector?: string | null;
   project_status?: string | null;
+  maturity?: string | null;
+  needs?: string | null;
   search?: string | null;
   limit?: number;
 }): Promise<Startup[]> {
-  const { sector, project_status, search, limit = 100 } = params;
+  const { sector, project_status, maturity, needs, search, limit = 100 } = params;
   let query = supabase
     .from("startups")
-    .select("id,name,description,sector,needs,project_status,website_url");
+    .select("id,name,description,sector,needs,project_status,website_url,maturity");
 
   if (sector && sector !== "") {
     query = query.eq("sector", sector);
   }
   if (project_status && project_status !== "") {
     query = query.eq("project_status", project_status);
+  }
+  if (maturity && maturity !== "") {
+    query = query.eq("maturity", maturity);
+  }
+  if (needs && needs !== "") {
+    query = query.eq("needs", needs);
   }
   if (search && search.trim().length > 0) {
     const escaped = search.replace(/[%_]/g, (m) => `\\${m}`);

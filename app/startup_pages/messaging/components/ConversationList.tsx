@@ -36,7 +36,7 @@ export default function ConversationList({
 }: Props) {
   return (
     <nav
-      className="w-64 min-w-[16rem] max-w-xs border-r flex flex-col"
+      className="w-full md:w-64 md:min-w-[16rem] md:max-w-xs border-r flex flex-col"
       style={{ background: PASTEL.lavande, color: PASTEL.violetDark, borderColor: PASTEL.violet }}
     >
       <div
@@ -67,7 +67,7 @@ export default function ConversationList({
           >
             <option value="">Select a user</option>
             {users
-              .filter(u => u.id !== currentUser?.id)
+              .filter(u => u.uuid !== currentUser?.uuid)
               .map(u => (
                 <option key={u.id} value={u.id}>
                   {u.name}

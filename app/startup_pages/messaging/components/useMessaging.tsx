@@ -45,12 +45,12 @@ export function useMessaging() {
 
   useEffect(() => {
     (async () => {
-      const { data, error } = await supabase.from("users").select("id, name, uuid, role");
+      const { data, error } = await supabase.from("users").select("id, name, uuid, role, email");
       if (!error && data) {
         setUsers(
           data.map((u) => ({
             id: u.id.toString(),
-            name: u.name,
+            name: u.name || u.email || `User ${u.id}`,
             uuid: u.uuid,
             role: u.role,
           }))
@@ -125,7 +125,10 @@ export function useMessaging() {
               (msg.sender_id === selectedUser.uuid &&
                 msg.receiver_id === currentUser.uuid))
           ) {
-            setMessages((prev) => [...prev, msg]);
+            setMessages((prev) => {
+              if (prev.some((m) => m.id === (msg as any).id)) return prev;
+              return [...prev, msg];
+            });
           }
           setConversations((prev) => {
             const partnerUuid =
@@ -153,17 +156,56 @@ export function useMessaging() {
 
   const sendMessage = async (text: string) => {
     if (!currentUser || !selectedUser || !text.trim()) return;
-    await supabase.from("messages").insert([
-      {
-        sender_id: currentUser.uuid,
-        receiver_id: selectedUser.uuid,
-        message: text,
-      },
-    ]);
+    const payload = {
+      sender_id: currentUser.uuid,
+      receiver_id: selectedUser.uuid,
+      message: text,
+    };
+    const { data, error } = await supabase
+      .from("messages")
+      .insert([payload])
+      .select("*")
+      .single();
+
+    if (!error) {
+      const inserted: Message = data || {
+        id: Math.random(),
+        created_at: new Date().toISOString(),
+        ...payload,
+      } as unknown as Message;
+
+      if (
+        selectedUser &&
+        ((inserted.sender_id === currentUser.uuid && inserted.receiver_id === selectedUser.uuid) ||
+          (inserted.sender_id === selectedUser.uuid && inserted.receiver_id === currentUser.uuid))
+      ) {
+        setMessages((prev) => {
+          if (prev.some((m) => m.id === (inserted as any).id)) return prev;
+          return [...prev, inserted];
+        });
+      }
+
+      setConversations((prev) => {
+        const partnerUuid =
+          inserted.sender_id === currentUser.uuid ? inserted.receiver_id : inserted.sender_id;
+        const idx = prev.findIndex((c) => c.user.uuid === partnerUuid);
+        const user =
+          users.find((u) => u.uuid === partnerUuid) || {
+            id: partnerUuid,
+            name: `User ${partnerUuid}`,
+            uuid: partnerUuid,
+          };
+        const newConv = { user, lastMessage: inserted } as Conversation;
+        if (idx === -1) return [newConv, ...prev];
+        const copy = [...prev];
+        copy.splice(idx, 1);
+        return [newConv, ...copy];
+      });
+    }
   };
 
   const startNewConversation = (userId: string): User | null => {
-    const u = users.find((x) => x.id === userId) || null;
+    const u = users.find((x) => x.id === userId || x.uuid === userId) || null;
     if (!u || !currentUser) return null;
     const existing = conversations.find((c) => c.user.uuid === u.uuid);
     if (existing) {
