@@ -182,16 +182,6 @@ export default function ProfileEditor() {
                 className="w-full px-3 py-2 rounded-lg border-none bg-[#E4BEF8] text-[#7A3192] focus:outline-none focus:ring-2 focus:ring-[#C174F2] transition"
               />
             </label>
-            <label className="block mb-6">
-              <span className="text-sm font-semibold mb-1 text-[#F49C9C]">Avatar URL</span>
-              <input
-                type="url"
-                value={imageUrl || ""}
-                onChange={e => setImageUrl(e.target.value)}
-                placeholder="https://example.com/avatar.jpg"
-                className="w-full px-3 py-2 rounded-lg border-none bg-[#F8CACF] text-[#90576E] focus:outline-none focus:ring-2 focus:ring-[#F18585] transition"
-              />
-            </label>
 
             {uploading && (
               <p className="text-center text-[#CB90F1] mb-2">Uploading image...</p>
