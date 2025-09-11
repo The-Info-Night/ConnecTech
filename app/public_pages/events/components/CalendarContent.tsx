@@ -10,19 +10,20 @@ export default function CalendarContent() {
 
   return (
     <main
-      className="flex flex-col items-center justify-center min-h-[70vh] py-8 md:py-16 transition-all duration-300 px-2 md:px-8"
+      className="flex flex-col items-center justify-center min-h-[70vh] py-8 md:py-16 transition-all duration-300 px-2 sm:px-4 md:px-6 lg:px-8 w-full max-w-6xl mx-auto"
+      style={{ paddingLeft: "var(--side-navbar-width, 14rem)" }}
     >
       <h1
         className="text-2xl md:text-3xl font-extrabold mb-8 text-[#b046d4] text-center w-full max-w-4xl drop-shadow-lg"
       >
         Calendar – {currentMonth}
       </h1>
-      <div className="w-full max-w-4xl overflow-x-auto">
-        <div className="min-w-[560px] md:min-w-0 grid grid-cols-7 gap-2 md:gap-4">
+      <div className="w-full max-w-4xl">
+        <div className="grid grid-cols-7 gap-1 sm:gap-2 md:gap-4">
           {days.map((day) => (
             <div
               key={day}
-              className="text-center font-bold text-[#a735f0] text-xs sm:text-base py-2"
+              className="text-center font-bold text-[#a735f0] text-[10px] xs:text-xs sm:text-base py-1 sm:py-2"
             >
               {day}
             </div>
@@ -31,13 +32,13 @@ export default function CalendarContent() {
             <div
               key={date}
               className={`
-                relative flex items-center justify-center h-16 sm:h-20
+                relative flex items-center justify-center h-10 xs:h-12 sm:h-16 md:h-20
                 border-2 rounded-xl border-[#E4BEF8] bg-white/60
                 hover:bg-[#F8CACF]/70 transition
               `}
               style={{ minWidth: 0 }}
             >
-              <span className="absolute top-2 left-2 text-xs sm:text-sm text-[#CB90F1]">
+              <span className="absolute top-1 left-1 text-[10px] xs:text-xs sm:text-sm text-[#CB90F1]">
                 {date}
               </span>
               {date === 12 && (

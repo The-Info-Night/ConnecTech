@@ -21,9 +21,9 @@ export default function CatalogMessages() {
   const [newConversationUserId, setNewConversationUserId] = useState('');
 
   const handleStartConversation = (userId: string) => {
-    
+
     const selectedUserResult = startNewConversation(userId);
-    
+
     if (selectedUserResult) {
       setShowNewConversationForm(false);
       setNewConversationUserId('');
@@ -41,13 +41,16 @@ export default function CatalogMessages() {
     setShowNewConversationForm(false);
   };
 
-  const eligibleUsers = users.filter(
+  let eligibleUsers = users.filter(
     (user: any) => user.role === "founder" || user.role === "investor"
   );
+  if (eligibleUsers.length === 0) {
+    eligibleUsers = users;
+  }
 
 
   return (
-    <div className="flex h-[80vh] w-full border rounded-lg overflow-hidden shadow-lg">
+    <div className="flex flex-col md:flex-row h-[80vh] w-full border rounded-lg overflow-hidden shadow-lg">
       <ConversationList
         conversations={conversations}
         selectedUser={selectedUser}
@@ -60,8 +63,8 @@ export default function CatalogMessages() {
         newConversationUserId={newConversationUserId}
         setNewConversationUserId={setNewConversationUserId}
       />
-      
-      <main className="flex-1 flex flex-col" style={{ backgroundColor: "#fff" }}>
+
+      <main className="flex-1 flex flex-col min-w-0" style={{ backgroundColor: "#fff" }}>
         <MessageList
           messages={messages}
           currentUser={currentUser}

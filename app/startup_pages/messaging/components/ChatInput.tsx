@@ -20,7 +20,7 @@ export default function ChatInput({ onSendMessage, selectedUser }: Props) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!message.trim() || !selectedUser) return;
-    
+
     onSendMessage(message);
     setMessage("");
   };
@@ -30,12 +30,12 @@ export default function ChatInput({ onSendMessage, selectedUser }: Props) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="p-4 border-t flex gap-3"
+      className="p-3 sm:p-4 border-t flex gap-2 sm:gap-3"
       style={{ borderColor: PASTEL.lavande, backgroundColor: "#fff" }}
     >
       <input
         type="text"
-        className="flex-1 rounded-lg border px-4 py-2 focus:outline-none focus:ring-2 transition"
+        className="flex-1 rounded-lg border px-3 sm:px-4 py-2 text-sm sm:text-base focus:outline-none focus:ring-2 transition"
         style={{
           borderColor: PASTEL.violet,
           backgroundColor: PASTEL.lavande,
@@ -54,7 +54,7 @@ export default function ChatInput({ onSendMessage, selectedUser }: Props) {
       <button
         type="submit"
         disabled={!message.trim()}
-        className="px-6 py-2 rounded-lg font-medium transition disabled:opacity-50 hover:opacity-90"
+        className="px-4 sm:px-6 py-2 rounded-lg font-medium text-sm sm:text-base transition disabled:opacity-50 hover:opacity-90"
         style={{ backgroundColor: PASTEL.violet, color: "#fff" }}
       >
         Send
