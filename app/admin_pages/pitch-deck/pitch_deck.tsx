@@ -4,70 +4,88 @@ import { useRef, useState, useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
-import Link from "next/link";
-import { PDFDownloadLink, Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
 import { Download } from "lucide-react";
-
-const styles = StyleSheet.create({
-  page: { padding: 30, fontSize: 12, fontFamily: "Helvetica" },
-  title: { fontSize: 22, fontWeight: "bold", marginBottom: 12 },
-  subtitle: { fontSize: 16, fontWeight: "bold", marginTop: 12, marginBottom: 6 },
-  paragraph: { marginBottom: 8 },
-  listItem: { marginLeft: 12, marginBottom: 4 },
-});
-
-const PitchPdf = (
-  <Document>
-    <Page size="A4" style={styles.page}>
-      <Text style={styles.title}>Connectech Pitch Deck</Text>
-
-      <Text style={styles.subtitle}>The Problem</Text>
-      <Text style={styles.listItem}>• Current solutions are inefficient and outdated</Text>
-      <Text style={styles.listItem}>• Businesses lose $X billion annually due to inefficiencies</Text>
-      <Text style={styles.listItem}>• No integrated platform addresses all customer needs</Text>
-
-      <Text style={styles.subtitle}>Our Solution</Text>
-      <Text style={styles.paragraph}>
-        A comprehensive SaaS solution that increases efficiency by 40%, reduces costs by 30%, improves customer satisfaction, and offers a scalable architecture.
-      </Text>
-
-      <Text style={styles.subtitle}>Market Opportunity</Text>
-      <Text style={styles.listItem}>• TAM: $42B</Text>
-      <Text style={styles.listItem}>• SAM: $12B</Text>
-      <Text style={styles.listItem}>• SOM: $850M</Text>
-
-      <Text style={styles.subtitle}>Traction</Text>
-      <Text style={styles.listItem}>• 42% MoM Growth</Text>
-      <Text style={styles.listItem}>• 250+ Active Clients</Text>
-      <Text style={styles.listItem}>• 98% Retention Rate</Text>
-      <Text style={styles.paragraph}>Recent milestones: Closed $5M Series A funding, launched v2.0 with AI capabilities, and partnership with Industry Leader Inc.</Text>
-
-      <Text style={styles.subtitle}>Business Model</Text>
-      <Text style={styles.listItem}>• SaaS Subscription ($99–499/mo, tiered pricing)</Text>
-      <Text style={styles.listItem}>• Enterprise (Custom, white-label solutions)</Text>
-      <Text style={styles.listItem}>• Marketplace (15% transaction commission)</Text>
-
-      <Text style={styles.subtitle}>Our Team</Text>
-      <Text style={styles.listItem}>• Jane Doe – CEO, Former Google PM</Text>
-      <Text style={styles.listItem}>• John Smith – CTO, Ex-Microsoft</Text>
-      <Text style={styles.listItem}>• Alice Johnson – CPO, UX Expert</Text>
-      <Text style={styles.listItem}>• Robert Brown – CFO, Financial Strategist</Text>
-
-      <Text style={styles.subtitle}>Financial Projections</Text>
-      <Text style={styles.listItem}>• 2024: Revenue $2.5M, Gross Margin 75%, Customers 850</Text>
-      <Text style={styles.listItem}>• 2025: Revenue $8.7M, Gross Margin 78%, Customers 2400</Text>
-      <Text style={styles.listItem}>• 2026: Revenue $22.4M, Gross Margin 82%, Customers 5800</Text>
-
-      <Text style={styles.subtitle}>Fundraising</Text>
-      <Text style={styles.paragraph}>We’re raising $8M (already $5M committed, $3M remaining).</Text>
-      <Text style={styles.paragraph}>Contact: invest@.com</Text>
-    </Page>
-  </Document>
-);
 
 export default function PitchDeckPage({ sidebarOpen = false }: { sidebarOpen?: boolean }) {
   const contentRef = useRef<HTMLDivElement | null>(null);
 
+  const handleExport = () => {
+    const doc = new jsPDF();
+  
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(18);
+    doc.text("Connectech Pitch Deck", 10, 20);
+  
+    let y = 30;
+  
+    const addSection = (title: string, content: string[] | string) => {
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(14);
+      doc.text(title, 10, y);
+      y += 7;
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(11);
+  
+      if (Array.isArray(content)) {
+        content.forEach(line => {
+          doc.text(line, 15, y);
+          y += 6;
+        });
+      } else {
+        doc.text(content, 15, y, { maxWidth: 180 });
+        y += 12;
+      }
+      y += 3;
+    };
+  
+    addSection("The Problem", [
+      "• Current solutions are inefficient and outdated",
+      "• Businesses lose $X billion annually due to inefficiencies",
+      "• No integrated platform addresses all customer needs"
+    ]);
+  
+    addSection("Our Solution",
+      "A comprehensive SaaS solution that increases efficiency by 40%, reduces costs by 30%, improves customer satisfaction, and offers a scalable architecture."
+    );
+  
+    addSection("Market Opportunity", [
+      "• TAM: $42B", "• SAM: $12B", "• SOM: $850M"
+    ]);
+  
+    addSection("Traction", [
+      "• 42% MoM Growth",
+      "• 250+ Active Clients",
+      "• 98% Retention Rate",
+      "Milestones: $5M Series A, launched v2.0 AI, partnership with Industry Leader Inc."
+    ]);
+  
+    addSection("Business Model", [
+      "• SaaS Subscription ($99–499/mo)",
+      "• Enterprise (Custom, white-label)",
+      "• Marketplace (15% commission)"
+    ]);
+  
+    addSection("Our Team", [
+      "• Jane Doe – CEO (ex-Google)",
+      "• John Smith – CTO (ex-Microsoft)",
+      "• Alice Johnson – CPO (UX Expert)",
+      "• Robert Brown – CFO (Strategist)"
+    ]);
+  
+    addSection("Financial Projections", [
+      "• 2024: $2.5M revenue, 75% margin, 850 customers",
+      "• 2025: $8.7M revenue, 78% margin, 2400 customers",
+      "• 2026: $22.4M revenue, 82% margin, 5800 customers"
+    ]);
+  
+    addSection("Fundraising", [
+      "We’re raising $8M (already $5M committed, $3M remaining).",
+      "Contact: invest@.com"
+    ]);
+  
+    doc.save("pitch-deck.pdf");
+  };
+  
   const PALETTE = {
     rose: "#F18585",
     saumon: "#F49C9C",
@@ -320,19 +338,13 @@ export default function PitchDeckPage({ sidebarOpen = false }: { sidebarOpen?: b
           </section>
 
           <div className="mt-8 text-center">
-          <PDFDownloadLink
-            document={PitchPdf}
-            fileName="pitch-deck.pdf"
-          >
-            {({ loading }) => (
-              <button
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-[#EED5FB] text-[#7A3192] font-bold shadow hover:bg-[#CB90F1]/10 transition"
-              >
-                <Download className="w-5 h-5" />
-                {loading ? "Preparing..." : "Extract as PDF"}
-              </button>
-            )}
-          </PDFDownloadLink>
+            <button
+              onClick={handleExport}
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-[#EED5FB] text-[#7A3192] font-bold shadow hover:bg-[#CB90F1]/10 transition"
+            >
+              <Download className="w-5 h-5" />
+              Extract as PDF
+            </button>
           </div>
         </div>
       </main>

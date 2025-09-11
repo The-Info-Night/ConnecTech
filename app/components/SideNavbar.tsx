@@ -87,16 +87,6 @@ const NAV_SECTIONS: { category: string; items: NavItem[] }[] = [
     category: "Public",
     items: [
       {
-        name: "Home",
-        icon: (
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-            <path d="M3 12l9-9 9 9" />
-            <path d="M9 21V9h6v12" />
-          </svg>
-        ),
-        href: "/",
-      },
-      {
         name: "Catalog",
         icon: (
           <svg
@@ -167,6 +157,13 @@ export default function SideNavbar() {
     window.addEventListener("resize", checkDesktop);
     return () => window.removeEventListener("resize", checkDesktop);
   }, []);
+
+  useEffect(() => {
+    if (typeof document !== "undefined") {
+      const width = isDesktop ? (open ? "14rem" : "5rem") : "0rem";
+      document.documentElement.style.setProperty("--side-navbar-width", width);
+    }
+  }, [open, isDesktop]);
 
   useEffect(() => {
     let isMounted = true;

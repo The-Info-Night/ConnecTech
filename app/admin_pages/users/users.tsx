@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
+import { supabase } from "@/lib/supabaseClient";
 
 type DbUser = {
   id: number;
@@ -23,7 +24,12 @@ export default function UsersAdminPage() {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch("/api/users", { cache: "no-store" });
+        const { data: sessionData } = await supabase.auth.getSession();
+        const token = sessionData?.session?.access_token;
+        const res = await fetch("/api/users", {
+          cache: "no-store",
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
         const json = await res.json();
         if (!res.ok) throw new Error(json.error || "Failed to load users");
         setUsers(json.users || []);
@@ -58,9 +64,14 @@ export default function UsersAdminPage() {
   async function saveUser(uuid: string, values: Partial<DbUser>) {
     setSavingId(uuid);
     try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData?.session?.access_token;
       const res = await fetch("/api/users", {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify({ uuid, values }),
       });
       const json = await res.json();
@@ -90,44 +101,47 @@ export default function UsersAdminPage() {
   return (
     <div
       className="min-h-screen w-full p-4"
-      style={{ backgroundColor: "#1A1D21" }}
+      style={{
+        background:
+          "linear-gradient(90deg, #F18585 0%, #F49C9C 12%, #F6AEAE 24%, #F8CACF 36%, #EED5FB 48%, #E4BEF8 60%, #D5A8F2 72%, #CB90F1 84%, #C174F2 100%)",
+      }}
     >
       <div className="max-w-6xl mx-auto">
         <h1 className="text-2xl font-bold mb-4 text-white">Admin • Users</h1>
 
         <div className="mb-4 flex items-center gap-2">
           <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search by email, name, role, id"
-            className="w-full md:w-80 px-3 py-2 rounded-md border border-gray-300"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder="Search by email, name, role, id"
+        className="w-full md:w-80 px-3 py-2 rounded-md border border-white text-white placeholder-white"
           />
         </div>
 
         <div className="overflow-x-auto bg-white/95 rounded-xl border border-[#E4BEF8] shadow">
           <table className="min-w-full text-sm text-[#7A3192]">
-            <thead>
-              <tr className="bg-[#EED5FB] text-[#7A3192]">
-                <th className="text-left px-3 py-2">ID</th>
-                {columns.map((c) => (
-                  <th key={c.key} className="text-left px-3 py-2">
-                    {c.label}
-                  </th>
-                ))}
-                <th className="px-3 py-2">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((u) => (
-                <EditableRow
-                  key={u.uuid}
-                  user={u}
-                  columns={columns}
-                  onSave={saveUser}
-                  saving={savingId === u.uuid}
-                />
-              ))}
-            </tbody>
+        <thead>
+          <tr className="bg-[#EED5FB] text-[#7A3192]">
+            <th className="text-left px-3 py-2">ID</th>
+            {columns.map((c) => (
+          <th key={c.key} className="text-left px-3 py-2">
+            {c.label}
+          </th>
+            ))}
+            <th className="px-3 py-2">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {filtered.map((u) => (
+            <EditableRow
+          key={u.uuid}
+          user={u}
+          columns={columns}
+          onSave={saveUser}
+          saving={savingId === u.uuid}
+            />
+          ))}
+        </tbody>
           </table>
         </div>
       </div>
