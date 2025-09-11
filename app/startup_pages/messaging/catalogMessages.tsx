@@ -50,7 +50,7 @@ export default function CatalogMessages() {
 
 
   return (
-    <div className="flex flex-col md:flex-row h-[80vh] w-full border rounded-lg overflow-hidden shadow-lg">
+    <div className="flex flex-col md:flex-row h-[80vh] min-h-0 w-full border rounded-lg overflow-hidden shadow-lg">
       <ConversationList
         conversations={conversations}
         selectedUser={selectedUser}
@@ -64,7 +64,7 @@ export default function CatalogMessages() {
         setNewConversationUserId={setNewConversationUserId}
       />
 
-      <main className="flex-1 flex flex-col min-w-0" style={{ backgroundColor: "#fff" }}>
+      <main className="flex-1 flex flex-col min-w-0 min-h-0" style={{ backgroundColor: "#fff" }}>
         <MessageList
           messages={messages}
           currentUser={currentUser}

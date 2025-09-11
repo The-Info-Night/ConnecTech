@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Message, User } from './useMessaging';
 
 const PASTEL = {
@@ -17,6 +17,15 @@ type Props = {
 };
 
 export default function MessageList({ messages, currentUser, selectedUser, users }: Props) {
+  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
+  const bottomRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const el = bottomRef.current;
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    }
+  }, [messages, selectedUser?.uuid]);
   if (!selectedUser) {
     return (
       <div className="flex-1 flex items-center justify-center" style={{ color: PASTEL.violet }}>
@@ -31,7 +40,7 @@ export default function MessageList({ messages, currentUser, selectedUser, users
   });
 
   return (
-    <div className="flex-1 flex flex-col min-w-0">
+    <div className="flex-1 flex flex-col min-w-0 min-h-0">
       <header className="p-3 sm:p-4 border-b flex items-center gap-2 sm:gap-3" style={{ borderColor: PASTEL.lavande, backgroundColor: "#fff" }}>
         <div
           className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-white font-bold uppercase text-sm"
@@ -44,7 +53,7 @@ export default function MessageList({ messages, currentUser, selectedUser, users
         </h2>
       </header>
 
-      <div className="flex-1 overflow-auto p-3 sm:p-4 space-y-2 sm:space-y-3 bg-white">
+      <div ref={scrollContainerRef} className="flex-1 overflow-y-auto overflow-x-hidden p-3 sm:p-4 space-y-2 sm:space-y-3 bg-white min-h-0">
         {messages.length === 0 ? (
           <div className="text-center" style={{ color: PASTEL.violet }}>
             No messages yet. Say hello!
@@ -84,6 +93,7 @@ export default function MessageList({ messages, currentUser, selectedUser, users
             );
           })
         )}
+        <div ref={bottomRef} />
       </div>
     </div>
   );
