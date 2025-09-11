@@ -17,6 +17,7 @@ export default function ProfileEditor() {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -60,42 +61,36 @@ export default function ProfileEditor() {
     if (!file || !profile) return;
     setUploading(true);
     setError(null);
-    try {
-      const fileExt = file.name.split('.').pop();
-      const timestamp = Date.now();
-      const filePath = `${profile.uuid}/${timestamp}_${file.name}`;
-  
-      console.log("profile.uuid =", profile?.uuid, "user id =", (await supabase.auth.getUser()).data.user?.id, "filePath =", filePath);
-      const { error: uploadError } = await supabase
-        .storage
-        .from('profile_picture')
-        .upload(filePath, file, { upsert: true });
-      if (uploadError) throw uploadError;
-  
-      const { data } = supabase
-        .storage
-        .from('profile_picture')
-        .getPublicUrl(filePath);
-      if (!data?.publicUrl) throw new Error('Could not get public URL.');
-      setImageUrl(data.publicUrl);
 
-  
-      const { error: updateError } = await supabase
-        .from('users')
-        .update({ image_url: data.publicUrl })
-        .eq('uuid', profile.uuid);
-      if (updateError) throw updateError;
-  
-      await supabase.auth.updateUser({
-        data: { avatar_url: data.publicUrl },
-      });
+    try {
+      // Convertir le fichier en base64
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const base64String = reader.result as string;
+        setImageUrl(base64String);
+
+        // Mettre à jour le champ image_url dans la table users
+        const { error: updateError } = await supabase
+          .from('users')
+          .update({ image_url: base64String })
+          .eq('uuid', profile.uuid);
+
+        if (updateError) {
+          setError(updateError.message);
+        } else {
+          setSuccess("Changes saved");
+          setProfile({ ...profile, image_url: base64String });
+        }
+        setUploading(false);
+        if (fileInputRef.current) fileInputRef.current.value = '';
+      };
+      reader.readAsDataURL(file);
     } catch (err: any) {
       setError(
         typeof err === 'object' && err.message
           ? err.message
           : 'Error uploading image.'
       );
-    } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
     }
@@ -106,18 +101,23 @@ export default function ProfileEditor() {
     if (!profile) return;
     setSaving(true);
     setError(null);
+    setSuccess(null);
 
     const updates = {
-      uuid: profile.uuid,
       name,
       image_url: imageUrl,
       updated_at: new Date().toISOString(),
     };
-    const { error: updateError } = await supabase.from("users").upsert(updates, {onConflict: "uuid"});
+    const { error: updateError } = await supabase
+      .from("users")
+      .update(updates)
+      .eq("uuid", profile.uuid);
     if (updateError) {
       setError(updateError.message);
+      setSuccess(null);
     } else {
       setProfile({ ...profile, name, image_url: imageUrl });
+      setSuccess("Changes saved");
     }
     setSaving(false);
   }
@@ -187,6 +187,9 @@ export default function ProfileEditor() {
               <p className="text-center text-[#CB90F1] mb-2">Uploading image...</p>
             )}
             {error && <p className="text-red-500 mb-4">{error}</p>}
+            {success && (
+              <p className="text-green-600 mb-4 text-center">{success}</p>
+            )}
 
             <button
               onClick={handleSave}

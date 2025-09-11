@@ -1,9 +1,9 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { supabase } from "../../supabaseClient";
 import { useRouter } from "next/navigation";
 
-type UserProfile = { id: string; email: string; avatar_url?: string; full_name?: string; };
+type UserProfile = { id: string; email: string; image_url?: string; full_name?: string; };
 
 export default function AccountDropdown({
   userId,
@@ -15,6 +15,19 @@ export default function AccountDropdown({
   onOpenSidebar: () => void;
 }) {
   const [open, setOpen] = useState(false);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  useEffect(() => {
+    async function fetchProfile() {
+      if (!userId) return;
+      const { data, error } = await supabase
+        .from("users")
+        .select("image_url")
+        .eq("uuid", userId)
+        .maybeSingle();
+  if (!error && data) setProfile({ id: userId, email: "", ...data });
+    }
+    fetchProfile();
+  }, [userId]);
   const router = useRouter();
 
   const handleClick = () => {
@@ -43,10 +56,18 @@ export default function AccountDropdown({
           boxShadow: "0 1px 4px 0 #cb90f122",
         }}
       >
-        <svg className="w-6 h-6" fill="none" stroke="#7A3192" strokeWidth={2} viewBox="0 0 24 24">
-          <circle cx="12" cy="8" r="4" />
-          <path d="M4 20c0-4 4-7 8-7s8 3 8 7" />
-        </svg>
+        {profile?.image_url ? (
+          <img
+            src={profile.image_url}
+            alt="avatar"
+            className="w-6 h-6 rounded-full object-cover border border-[#CB90F1]"
+          />
+        ) : (
+          <svg className="w-6 h-6" fill="none" stroke="#7A3192" strokeWidth={2} viewBox="0 0 24 24">
+            <circle cx="12" cy="8" r="4" />
+            <path d="M4 20c0-4 4-7 8-7s8 3 8 7" />
+          </svg>
+        )}
         {sidebarOpen && (
           <span className="transition-all duration-200 ml-2">Account</span>
         )}
