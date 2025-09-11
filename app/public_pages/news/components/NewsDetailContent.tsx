@@ -54,16 +54,9 @@ export default function NewsDetailContent() {
   };
 
   return (
-    <div
-      className="min-h-screen w-full font-sans"
-      style={{
-        background:
-          "linear-gradient(180deg, #F18585 0%, #F49C9C 18%, #F6AEAE 34%, #F8CACF 50%, #EED5FB 56%, #E4BEF8 72%, #D5A8F2 85%, #CB90F1 94%, #C174F2 100%)",
-      }}
-    >
+    <div className="min-h-screen w-full font-sans">
       <main
-        className="flex flex-col items-center min-h-[70vh] py-10 px-4 sm:px-6 md:px-12 lg:px-20 max-w-3xl mx-auto"
-        style={{ marginTop: "56px" }}
+        className="flex flex-col items-center min-h-[70vh] py-10 px-4 sm:px-6 md:px-12 lg:px-20 max-w-3xl mx-auto transition-all duration-300 pl-0 lg:pl-[14rem]"
       >
         <button
           type="button"

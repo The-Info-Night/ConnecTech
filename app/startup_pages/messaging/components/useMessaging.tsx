@@ -15,6 +15,7 @@ export type User = {
   id: string;
   name: string;
   uuid: string;
+  role?: string;
 };
 
 export type Conversation = {
@@ -44,13 +45,14 @@ export function useMessaging() {
 
   useEffect(() => {
     (async () => {
-      const { data, error } = await supabase.from("users").select("id, name, uuid");
+      const { data, error } = await supabase.from("users").select("id, name, uuid, role");
       if (!error && data) {
         setUsers(
           data.map((u) => ({
             id: u.id.toString(),
             name: u.name,
             uuid: u.uuid,
+            role: u.role,
           }))
         );
       }

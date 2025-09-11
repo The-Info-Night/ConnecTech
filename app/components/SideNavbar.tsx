@@ -159,6 +159,13 @@ export default function SideNavbar() {
   }, []);
 
   useEffect(() => {
+    if (typeof document !== "undefined") {
+      const width = isDesktop ? (open ? "14rem" : "5rem") : "0rem";
+      document.documentElement.style.setProperty("--side-navbar-width", width);
+    }
+  }, [open, isDesktop]);
+
+  useEffect(() => {
     let isMounted = true;
     async function getUserAndRole() {
       setLocalLoading(true);

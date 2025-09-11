@@ -80,17 +80,6 @@ export default function AccountDropdown({
             <span>Profile</span>
           </button>
           <button
-            onClick={() => router.push("/settings")}
-            className="
-              w-full text-left px-4 py-2 rounded-lg
-              font-semibold flex gap-2 items-center
-              text-[#7A3192] hover:bg-[#E4BEF8] hover:text-[#CB90F1]
-              transition
-            "
-          >
-            <span>Settings</span>
-          </button>
-          <button
             onClick={handleLogout}
             className="
               w-full text-left px-4 py-2 rounded-lg

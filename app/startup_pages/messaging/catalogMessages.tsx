@@ -41,6 +41,10 @@ export default function CatalogMessages() {
     setShowNewConversationForm(false);
   };
 
+  const eligibleUsers = users.filter(
+    (user: any) => user.role === "founder" || user.role === "investor"
+  );
+
 
   return (
     <div className="flex h-[80vh] w-full border rounded-lg overflow-hidden shadow-lg">
@@ -49,7 +53,7 @@ export default function CatalogMessages() {
         selectedUser={selectedUser}
         onSelectUser={handleSelectUser}
         onShowNewConversation={handleShowNewConversation}
-        users={users}
+        users={eligibleUsers}
         currentUser={currentUser}
         onStartConversation={handleStartConversation}
         showNewConversationForm={showNewConversationForm}
